@@ -10,12 +10,13 @@ import com.microsoft.azure.sdk.iot.common.setup.iothub.ReceiveMessagesCommon;
 import com.microsoft.azure.sdk.iot.device.DeviceClient;
 import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
 import com.microsoft.azure.sdk.iot.device.ModuleClient;
-import com.microsoft.azure.sdk.iot.service.Module;
+import com.microsoft.azure.sdk.iot.service.*;
 import com.microsoft.azure.sdk.iot.service.auth.AuthenticationType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -24,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.microsoft.azure.sdk.iot.common.helpers.CorrelationDetailsLoggingAssert.buildExceptionMessage;
 import static com.microsoft.azure.sdk.iot.device.IotHubClientProtocol.*;
+import static org.junit.Assert.fail;
 
 /**
  * Test class containing all non error injection tests to be run on JVM and android pertaining to receiving messages on a device/module. Class needs to be extended
@@ -82,7 +84,6 @@ public class ReceiveMessagesTests extends ReceiveMessagesCommon
 
         waitForMessageToBeReceived(messageReceived, testInstance.protocol.toString());
 
-        Thread.sleep(200);
         testInstance.client.closeNow();
     }
 
