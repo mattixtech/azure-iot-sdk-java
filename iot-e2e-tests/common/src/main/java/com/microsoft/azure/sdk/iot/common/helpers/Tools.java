@@ -10,7 +10,6 @@ import com.microsoft.azure.sdk.iot.service.Device;
 import com.microsoft.azure.sdk.iot.service.Module;
 import com.microsoft.azure.sdk.iot.service.RegistryManager;
 import com.microsoft.azure.sdk.iot.service.exceptions.IotHubException;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.IOException;
@@ -23,7 +22,6 @@ import java.util.Map;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-@Slf4j
 public class Tools
 {
     private static final String ANDROID_BUILD_CONFIG_CLASS = "com.iothub.azure.microsoft.com.androide2e.test";
@@ -90,12 +88,10 @@ public class Tools
                     envVariables.put(field.getName(), field.get(null).toString());
                 }
                 catch (IllegalAccessException e) {
-                    log.error("Cannot access the following field: ", e);
                 }
             });
         }
         catch (ClassNotFoundException e) {
-            log.debug("Running the JVM tests");
         }
 
         return envVariables;
