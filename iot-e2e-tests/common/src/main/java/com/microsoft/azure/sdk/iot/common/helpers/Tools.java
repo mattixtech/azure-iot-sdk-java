@@ -24,7 +24,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class Tools
 {
-    private static final String ANDROID_BUILD_CONFIG_CLASS = "com.iothub.azure.microsoft.com.androide2e.test";
+    private static final String ANDROID_BUILD_CONFIG_CLASS = "com.microsoft.azure.sdk.iot.android.BuildConfig";
     private static final Map<String, String> ANDROID_ENV_VAR = retrieveAndroidEnvVariables();
 
     private static final long RETRY_TIMEOUT_ON_NETWORK_FAILURE = 60 * 1000;
