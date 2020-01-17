@@ -30,41 +30,10 @@ import static com.microsoft.azure.sdk.iot.digitaltwin.e2e.simulator.TestInterfac
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DigitalTwinServiceClientE2ETests {
-    private static final String IOT_HUB_CONNECTION_STRING = retrieveEnvironmentVariableValue(IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
-    private static final String TEST_INTERFACE_INSTANCE_NAME = retrieveInterfaceNameFromInterfaceId(TEST_INTERFACE_ID);
-
-    private static final String DEVICE_ID_PREFIX = "DigitalTwinServiceClientE2ETests_";
-
-    private static final String INVALID_MODEL_URN = "urn:invalidNamespace:invalidModelName:1"; // Model ID format should contain a min of 4 segments [urn:namespace:name:version]
-    private static final String INVALID_INTERFACE_URN = "urn:invalidNamespace:invalidInterfaceName:1"; // Interface ID format should contain a min of 4 segments [urn:namespace:name:version]
-    private static final String INVALID_DEVICE_ID = "InvalidDevice";
-
-    private static DigitalTwinServiceClient digitalTwinServiceClient;
-    private TestDigitalTwinDevice testDevice;
-
     @Rule
     public Timeout globalTimeout = Timeout.seconds(5 * 60); // 5 minutes max per method tested
 
-    @BeforeClass
-    public static void setUp() {
-        digitalTwinServiceClient = DigitalTwinServiceClientImpl.buildFromConnectionString()
-                                                               .connectionString(IOT_HUB_CONNECTION_STRING)
-                                                               .build();
-    }
-
-    @Before
-    public void setUpTest() throws IotHubException, IOException, URISyntaxException {
-        testDevice = new TestDigitalTwinDevice(DEVICE_ID_PREFIX.concat(UUID.randomUUID().toString()), MQTT);
-    }
-
     @Test
     public void testGetModelInformationValidModelUrn() {
-    }
-
-    @After
-    public void tearDownTest() {
-        if (testDevice != null) {
-            testDevice.closeAndDeleteDevice();
-        }
     }
 }

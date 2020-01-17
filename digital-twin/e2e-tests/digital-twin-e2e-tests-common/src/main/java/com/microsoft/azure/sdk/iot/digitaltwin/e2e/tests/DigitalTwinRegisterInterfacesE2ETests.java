@@ -45,24 +45,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
 public class DigitalTwinRegisterInterfacesE2ETests {
-    private static final String IOT_HUB_CONNECTION_STRING = retrieveEnvironmentVariableValue(IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
-    private static final String TEST_INTERFACE_INSTANCE_NAME_1 = retrieveInterfaceNameFromInterfaceId(TestInterfaceInstance1.TEST_INTERFACE_ID);
-    private static final String TEST_INTERFACE_INSTANCE_NAME_2 = retrieveInterfaceNameFromInterfaceId(TestInterfaceInstance2.TEST_INTERFACE_ID);
-    private static final String UNPUBLISHED_INTERFACE_INSTANCE_NAME = retrieveInterfaceNameFromInterfaceId(UnpublishedInterfaceInstance.TEST_INTERFACE_ID);
-    private static final String INVALID_INTERFACE_INSTANCE_NAME = "invalidInterfaceInstanceName";
-
-    private static final String DEVICE_ID_PREFIX = "DigitalTwinRegisterInterfacesE2ETests_";
-    private static final String DIGITAL_TWIN_INTERFACE_PATTERN = "\"%s\":\"%s\"";
-
-    private static DigitalTwinServiceClient digitalTwinServiceClient;
-    private String digitalTwinId;
-    private TestDigitalTwinDevice testDevice;
-    private TestInterfaceInstance1 testInterfaceInstance1;
-    private TestInterfaceInstance2 testInterfaceInstance2;
-
-    @Rule
-    public Timeout globalTimeout = Timeout.seconds(5 * 60); // 5 minutes max per method tested
-
     @Parameterized.Parameter(0)
     public IotHubClientProtocol protocol;
 
@@ -74,21 +56,8 @@ public class DigitalTwinRegisterInterfacesE2ETests {
         });
     }
 
-    @BeforeClass
-    public static void setUp() {
-        digitalTwinServiceClient = DigitalTwinServiceClientImpl.buildFromConnectionString()
-                                                               .connectionString(IOT_HUB_CONNECTION_STRING)
-                                                               .build();
-    }
-
     @Test
     public void testRegisterSingleInterfaceSuccess() throws IotHubException, IOException, URISyntaxException {
     }
 
-    @After
-    public void tearDownTest() {
-        if (testDevice != null) {
-            testDevice.closeAndDeleteDevice();
-        }
-    }
 }

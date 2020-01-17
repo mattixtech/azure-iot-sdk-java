@@ -53,26 +53,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @RunWith(Parameterized.class)
 public class DigitalTwinCommandE2ETests {
-    private static final String IOT_HUB_CONNECTION_STRING = retrieveEnvironmentVariableValue(IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
-    private static final String TEST_INTERFACE_INSTANCE_NAME_1 = retrieveInterfaceNameFromInterfaceId(TestInterfaceInstance1.TEST_INTERFACE_ID);
-    private static final String TEST_INTERFACE_INSTANCE_NAME_2 = retrieveInterfaceNameFromInterfaceId(TEST_INTERFACE_ID);
-
-    private static final String DEVICE_ID_PREFIX = "DigitalTwinCommandE2ETests_";
-
-    private static final String SAMPLE_COMMAND_STRING_PAYLOAD = "\"samplePayload\"";
-    private static final String SAMPLE_COMMAND_JSON_PAYLOAD = "{\"desc\":\"abc\"}";
-    private static final String SAMPLE_COMMAND_INT_PAYLOAD = "5";
-    private static final String INVALID_INTERFACE_INSTANCE_NAME = "invalidInterfaceInstanceName";
-    private static final String INVALID_COMMAND_NAME = "invalidCommandName";
-    private static final String INTERFACE_INSTANCE_NOT_FOUND_MESSAGE_PATTERN = "Interface instance [%s] not found.";
-
-    private static DigitalTwinServiceClient digitalTwinServiceClient;
-    private static DigitalTwinServiceAsyncClient digitalTwinServiceAsyncClient;
-    private TestDigitalTwinDevice testDevice;
-
-    @Rule
-    public Timeout globalTimeout = Timeout.seconds(5 * 60); // 5 minutes max per method tested
-
     @Parameterized.Parameter(0)
     public IotHubClientProtocol protocol;
 
@@ -84,34 +64,7 @@ public class DigitalTwinCommandE2ETests {
         });
     }
 
-    @BeforeClass
-    public static void setUp() {
-        digitalTwinServiceClient = DigitalTwinServiceClientImpl.buildFromConnectionString()
-                                                               .connectionString(IOT_HUB_CONNECTION_STRING)
-                                                               .build();
-        digitalTwinServiceAsyncClient = DigitalTwinServiceAsyncClientImpl.buildFromConnectionString()
-                                                                         .connectionString(IOT_HUB_CONNECTION_STRING)
-                                                                         .build();
-    }
-
-    @Before
-    public void setUpTest() throws IotHubException, IOException, URISyntaxException {
-        testDevice = new TestDigitalTwinDevice(DEVICE_ID_PREFIX.concat(UUID.randomUUID().toString()), protocol);
-        DigitalTwinDeviceClient digitalTwinDeviceClient = testDevice.getDigitalTwinDeviceClient();
-
-        TestInterfaceInstance2 testInterfaceInstance2 = new TestInterfaceInstance2(TEST_INTERFACE_INSTANCE_NAME_2);
-        DigitalTwinClientResult registrationResult = digitalTwinDeviceClient.registerInterfacesAsync(DCM_ID, singletonList(testInterfaceInstance2)).blockingGet();
-        assertThat(registrationResult).isEqualTo(DigitalTwinClientResult.DIGITALTWIN_CLIENT_OK);
-    }
-
     @Test
     public void testDeviceClientReceivesSyncCommandWithStringPayloadAndResponds() {
-    }
-
-    @After
-    public void tearDownTest() {
-        if (testDevice != null) {
-            testDevice.closeAndDeleteDevice();
-        }
     }
 }

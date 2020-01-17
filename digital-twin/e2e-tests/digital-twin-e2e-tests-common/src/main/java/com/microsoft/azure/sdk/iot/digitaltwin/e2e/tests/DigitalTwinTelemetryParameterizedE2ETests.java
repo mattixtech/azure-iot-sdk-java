@@ -48,14 +48,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 @RunWith(Parameterized.class)
 public class DigitalTwinTelemetryParameterizedE2ETests {
-    private static final String TEST_INTERFACE_INSTANCE_NAME = retrieveInterfaceNameFromInterfaceId(TEST_INTERFACE_ID);
-
-    private static final String DEVICE_ID_PREFIX = "DigitalTwinTelemetryParameterizedE2ETests_";
-    private static final String TELEMETRY_PAYLOAD_PATTERN = "{\"%s\":%s}";
-
-    private TestInterfaceInstance2 testInterfaceInstance;
-    private TestDigitalTwinDevice testDevice;
-
     @Rule
     public Timeout globalTimeout = Timeout.seconds(5 * 60); // 5 minutes max per method tested
 
@@ -117,24 +109,8 @@ public class DigitalTwinTelemetryParameterizedE2ETests {
         return asList(data);
     }
 
-    @Before
-    public void setUpTest() throws IotHubException, IOException, URISyntaxException {
-        testDevice = new TestDigitalTwinDevice(DEVICE_ID_PREFIX.concat(UUID.randomUUID().toString()), protocol);
-        DigitalTwinDeviceClient digitalTwinDeviceClient = testDevice.getDigitalTwinDeviceClient();
-
-        testInterfaceInstance = new TestInterfaceInstance2(TEST_INTERFACE_INSTANCE_NAME);
-        DigitalTwinClientResult registrationResult = digitalTwinDeviceClient.registerInterfacesAsync(DCM_ID, singletonList(testInterfaceInstance)).blockingGet();
-        assertThat(registrationResult).isEqualTo(DigitalTwinClientResult.DIGITALTWIN_CLIENT_OK);
-    }
-
     @Test
     public void testSendTelemetryDifferentSchema() throws IOException, InterruptedException {
     }
 
-    @After
-    public void tearDownTest() {
-        if (testDevice != null) {
-            testDevice.closeAndDeleteDevice();
-        }
-    }
 }
