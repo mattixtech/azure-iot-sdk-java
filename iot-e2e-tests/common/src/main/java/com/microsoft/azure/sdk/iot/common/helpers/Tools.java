@@ -65,6 +65,10 @@ public class Tools
     }
 
     public static String retrieveEnvironmentVariableValue(String environmentVariableName) {
+        System.out.println("Getting env var, android env var map size is " + ANDROID_ENV_VAR.size());
+        for (String key : ANDROID_ENV_VAR.keySet()) {
+            System.out.println(key + " : " + ANDROID_ENV_VAR.get(key));
+        }
         String environmentVariableValue;
         if (ANDROID_ENV_VAR.containsKey(environmentVariableName)) {
             environmentVariableValue = ANDROID_ENV_VAR.get(environmentVariableName);
@@ -80,18 +84,22 @@ public class Tools
     }
 
     private static Map<String, String> retrieveAndroidEnvVariables() {
+        System.out.println("Getting env vars for android...");
         Map<String, String> envVariables = new HashMap<>();
         try {
             Class buildConfig = Class.forName(ANDROID_BUILD_CONFIG_CLASS);
             Arrays.stream(buildConfig.getFields()).forEach(field -> {
                 try {
                     envVariables.put(field.getName(), field.get(null).toString());
+                    System.out.println("Got field " + field.getName());
                 }
                 catch (IllegalAccessException e) {
+                    System.out.println(Tools.getStackTraceFromThrowable(e));
                 }
             });
         }
         catch (ClassNotFoundException e) {
+            System.out.println(Tools.getStackTraceFromThrowable(e));
         }
 
         return envVariables;
