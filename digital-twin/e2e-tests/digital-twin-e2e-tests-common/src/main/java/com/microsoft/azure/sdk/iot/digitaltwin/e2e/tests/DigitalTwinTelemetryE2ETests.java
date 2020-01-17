@@ -61,7 +61,7 @@ public class DigitalTwinTelemetryE2ETests {
     @Parameterized.Parameter(0)
     public IotHubClientProtocol protocol;
 
-    @Parameterized.Parameters(name = "{index}: Telemetry Test: protocol={0}")
+    @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> data() {
         return asList(new Object[][] {
                 {MQTT},

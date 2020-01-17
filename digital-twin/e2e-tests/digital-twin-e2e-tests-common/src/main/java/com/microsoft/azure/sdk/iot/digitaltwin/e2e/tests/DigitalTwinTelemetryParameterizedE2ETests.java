@@ -66,7 +66,7 @@ public class DigitalTwinTelemetryParameterizedE2ETests {
     @Parameterized.Parameter(2)
     public Object telemetryValue;
 
-    @Parameterized.Parameters(name = "{index}: Telemetry Test: protocol={0}, telemetry name={1}, telemetry value={2}")
+    @Parameterized.Parameters(name = "{0}_{1}_{2}")
     public static Collection<Object[]> data() {
         int arrayTelemetrySize = 5;
         String stringTelemetryValue = "StringTelemetryMessage_".concat(UUID.randomUUID().toString());
