@@ -64,8 +64,6 @@ public class DeviceTwinCommon extends IotHubIntegrationTest
     //Default Page Size for Query
     protected static final Integer PAGE_SIZE = 2;
 
-    protected static String iotHubConnectionString = Tools.retrieveEnvironmentVariableValue(TestConstants.IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
-
     // Constants used in for Testing
     protected static final String PROPERTY_KEY = "Key";
     protected static final String PROPERTY_KEY_QUERY = "KeyQuery";

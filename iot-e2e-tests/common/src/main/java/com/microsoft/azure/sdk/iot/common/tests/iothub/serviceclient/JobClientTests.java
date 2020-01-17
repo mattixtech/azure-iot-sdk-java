@@ -35,7 +35,6 @@ import static org.junit.Assert.*;
  */
 public class JobClientTests extends IotHubIntegrationTest
 {
-    protected static String iotHubConnectionString = Tools.retrieveEnvironmentVariableValue(TestConstants.IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
     private static JobClient jobClient;
     private static RegistryManager registryManager;
 

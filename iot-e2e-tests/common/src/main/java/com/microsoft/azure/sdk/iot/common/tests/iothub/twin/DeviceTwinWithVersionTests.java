@@ -38,7 +38,6 @@ public class DeviceTwinWithVersionTests extends IotHubIntegrationTest
     private static final long BREATHE_TIME = 100; // 0.1 sec
     private static final long MAXIMUM_TIME_TO_WAIT_FOR_IOTHUB = 1000; // 1 sec
     private static final long EXPECTED_PROPERTIES_MAX_WAIT_MS = 60 * 1000; //1 minute
-    protected static String iotHubConnectionString = "";
 
     private static final String PROPERTY_KEY_1 = "Key1";
     private static final String PROPERTY_VALUE_1 = "Value1";

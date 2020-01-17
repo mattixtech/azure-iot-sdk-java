@@ -43,8 +43,6 @@ public class ExportImportTests extends IotHubIntegrationTest
     private static final long IMPORT_JOB_TIMEOUT = 6 * 60 * 1000;
     private static final long EXPORT_JOB_TIMEOUT = 6 * 60 * 1000;
 
-    protected static String iotHubConnectionString = Tools.retrieveEnvironmentVariableValue(TestConstants.IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
-    protected static String storageAccountConnectionString = Tools.retrieveEnvironmentVariableValue(TestConstants.STORAGE_ACCOUNT_CONNECTION_STRING_ENV_VAR_NAME);
     private static String deviceId = "java-crud-e2e-test";
 
     private static CloudBlobClient blobClient;

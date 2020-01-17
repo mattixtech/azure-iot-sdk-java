@@ -30,7 +30,6 @@ import static org.junit.Assert.*;
  */
 public class RegistryManagerTests extends IotHubIntegrationTest
 {
-    protected static String iotHubConnectionString = Tools.retrieveEnvironmentVariableValue(TestConstants.IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
     private static String deviceIdPrefix = "java-crud-e2e-test-";
     private static String moduleIdPrefix = "java-crud-module-e2e-test-";
     private static String configIdPrefix = "java-crud-adm-e2e-test-";

@@ -61,29 +61,6 @@ public class ProvisioningCommon extends ProvisioningIntegrationTest
         GROUP
     }
 
-    public static final String IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME = "IOTHUB_CONNECTION_STRING";
-    public static String iotHubConnectionString = "";
-
-    public static final String FAR_AWAY_IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME = "FAR_AWAY_IOTHUB_CONNECTION_STRING";
-    public static String farAwayIotHubConnectionString = "";
-
-    public static final String CUSTOM_ALLOCATION_WEBHOOK_URL_VAR_NAME = "CUSTOM_ALLOCATION_POLICY_WEBHOOK";
-    public static String customAllocationWebhookUrl = "";
-
-    public static final String DPS_CONNECTION_STRING_ENV_VAR_NAME = "IOT_DPS_CONNECTION_STRING";
-    public static String provisioningServiceConnectionString = "";
-
-    public static final String DPS_CONNECTION_STRING_WITH_INVALID_CERT_ENV_VAR_NAME = "PROVISIONING_CONNECTION_STRING_INVALIDCERT";
-    public static String provisioningServiceWithInvalidCertConnectionString = "";
-
-    public static String provisioningServiceGlobalEndpoint = "global.azure-devices-provisioning.net";
-
-    public static final String DPS_GLOBAL_ENDPOINT_WITH_INVALID_CERT_ENV_VAR_NAME = "DPS_GLOBALDEVICEENDPOINT_INVALIDCERT";
-    public static String provisioningServiceGlobalEndpointWithInvalidCert = "";
-
-    public static final String DPS_ID_SCOPE_ENV_VAR_NAME = "IOT_DPS_ID_SCOPE";
-    public static String provisioningServiceIdScope = "";
-
     public static final long MAX_TIME_TO_WAIT_FOR_REGISTRATION = 60 * 1000;
 
     public static final String HMAC_SHA256 = "HmacSHA256";
@@ -171,19 +148,6 @@ public class ProvisioningCommon extends ProvisioningIntegrationTest
         registryManager = RegistryManager.createFromConnectionString(iotHubConnectionString);
 
         this.testInstance = new ProvisioningTestInstance(this.testInstance.protocol, this.testInstance.attestationType);
-    }
-
-    @BeforeClass
-    public static void getEnvironmentVariables()
-    {
-        iotHubConnectionString = Tools.retrieveEnvironmentVariableValue(IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
-        isBasicTierHub = Boolean.parseBoolean(Tools.retrieveEnvironmentVariableValue(TestConstants.IS_BASIC_TIER_HUB_ENV_VAR_NAME));
-        provisioningServiceConnectionString = Tools.retrieveEnvironmentVariableValue(DPS_CONNECTION_STRING_ENV_VAR_NAME);
-        provisioningServiceIdScope = Tools.retrieveEnvironmentVariableValue(DPS_ID_SCOPE_ENV_VAR_NAME);
-        farAwayIotHubConnectionString = Tools.retrieveEnvironmentVariableValue(FAR_AWAY_IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
-        customAllocationWebhookUrl = Tools.retrieveEnvironmentVariableValue(CUSTOM_ALLOCATION_WEBHOOK_URL_VAR_NAME);
-        provisioningServiceGlobalEndpointWithInvalidCert = Tools.retrieveEnvironmentVariableValue(DPS_GLOBAL_ENDPOINT_WITH_INVALID_CERT_ENV_VAR_NAME);
-        provisioningServiceWithInvalidCertConnectionString = Tools.retrieveEnvironmentVariableValue(DPS_CONNECTION_STRING_WITH_INVALID_CERT_ENV_VAR_NAME);
     }
 
     @After

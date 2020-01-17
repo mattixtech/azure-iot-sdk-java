@@ -27,7 +27,6 @@ import static org.junit.Assert.*;
  */
 public class ServiceClientTests extends IotHubIntegrationTest
 {
-    protected static String iotHubConnectionString = Tools.retrieveEnvironmentVariableValue(TestConstants.IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
     protected static String invalidCertificateServerConnectionString = Tools.retrieveEnvironmentVariableValue(TestConstants.UNTRUSTWORTHY_IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
     private static String deviceIdPrefix = "java-service-client-e2e-test";
     private static String content = "abcdefghijklmnopqrstuvwxyz1234567890";
