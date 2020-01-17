@@ -7,11 +7,11 @@ def APPCENTER_APP_SECRET = project.hasProperty('AppCenterAppSecret') ? '"'+proje
 def STORAGE_ACCOUNT_CONNECTION_STRING = project.hasProperty('StorageAccountConnectionString') ? '"'+project.property('StorageAccountConnectionString')+'"': '""'
 def IOT_DPS_CONNECTION_STRING = project.hasProperty('DeviceProvisioningServiceConnectionString') ? '"'+project.property('DeviceProvisioningServiceConnectionString')+'"': '""'
 def DEVICE_PROVISIONING_SERVICE_GLOBAL_ENDPOINT = project.hasProperty('DeviceProvisioningServiceGlobalEndpoint') ? '"'+project.property('DeviceProvisioningServiceGlobalEndpoint')+'"': '""'
-def INVALID_DEVICE_PROVISIONING_SERVICE_GLOBAL_ENDPOINT = project.hasProperty('InvalidDeviceProvisioningServiceGlobalEndpoint') ? '"'+project.property('InvalidDeviceProvisioningServiceGlobalEndpoint')+'"': '""'
-def INVALID_DEVICE_PROVISIONING_SERVICE_CONNECTION_STRING = project.hasProperty('InvalidDeviceProvisioningServiceConnectionString') ? '"'+project.property('InvalidDeviceProvisioningServiceConnectionString')+'"': '""'
-def DEVICE_PROVISIONING_SERVICE_ID_SCOPE = project.hasProperty('DeviceProvisioningServiceIdScope') ? '"'+project.property('DeviceProvisioningServiceIdScope')+'"': '""'
-def CUSTOM_ALLOCATION_WEBHOOK_URL = project.hasProperty('CustomAllocationWebhookUrl') ? '"'+project.property('CustomAllocationWebhookUrl')+'"': '""'
-def FAR_AWAY_IOT_HUB_CONNECTION_STRING = project.hasProperty('FarAwayIotHubConnectionString') ? '"'+project.property('FarAwayIotHubConnectionString')+'"': '""'
+def DPS_GLOBALDEVICEENDPOINT_INVALIDCERT = project.hasProperty('InvalidDeviceProvisioningServiceGlobalEndpoint') ? '"'+project.property('InvalidDeviceProvisioningServiceGlobalEndpoint')+'"': '""'
+def PROVISIONING_CONNECTION_STRING_INVALIDCERT = project.hasProperty('InvalidDeviceProvisioningServiceConnectionString') ? '"'+project.property('InvalidDeviceProvisioningServiceConnectionString')+'"': '""'
+def IOT_DPS_ID_SCOPE = project.hasProperty('DeviceProvisioningServiceIdScope') ? '"'+project.property('DeviceProvisioningServiceIdScope')+'"': '""'
+def CUSTOM_ALLOCATION_POLICY_WEBHOOK = project.hasProperty('CustomAllocationWebhookUrl') ? '"'+project.property('CustomAllocationWebhookUrl')+'"': '""'
+def FAR_AWAY_IOTHUB_CONNECTION_STRING = project.hasProperty('FarAwayIotHubConnectionString') ? '"'+project.property('FarAwayIotHubConnectionString')+'"': '""'
 def IS_BASIC_TIER_HUB = project.hasProperty('IsBasicTierHub') ? '"'+project.property('IsBasicTierHub')+'"' : '"false"'
 
 def STRING='String'
@@ -37,11 +37,11 @@ android {
             buildConfigField STRING, 'StorageAccountConnectionString', STORAGE_ACCOUNT_CONNECTION_STRING
             buildConfigField STRING, 'DeviceProvisioningServiceConnectionString', IOT_DPS_CONNECTION_STRING
             buildConfigField STRING, 'DeviceProvisioningServiceGlobalEndpoint', DEVICE_PROVISIONING_SERVICE_GLOBAL_ENDPOINT
-            buildConfigField STRING, 'InvalidDeviceProvisioningServiceGlobalEndpoint', INVALID_DEVICE_PROVISIONING_SERVICE_GLOBAL_ENDPOINT
-            buildConfigField STRING, 'InvalidDeviceProvisioningServiceConnectionString', INVALID_DEVICE_PROVISIONING_SERVICE_CONNECTION_STRING
-            buildConfigField STRING, 'DeviceProvisioningServiceIdScope', DEVICE_PROVISIONING_SERVICE_ID_SCOPE
-            buildConfigField STRING, 'CustomAllocationWebhookUrl', CUSTOM_ALLOCATION_WEBHOOK_URL
-            buildConfigField STRING, 'FarAwayIotHubConnectionString', FAR_AWAY_IOT_HUB_CONNECTION_STRING
+            buildConfigField STRING, 'InvalidDeviceProvisioningServiceGlobalEndpoint', DPS_GLOBALDEVICEENDPOINT_INVALIDCERT
+            buildConfigField STRING, 'InvalidDeviceProvisioningServiceConnectionString', PROVISIONING_CONNECTION_STRING_INVALIDCERT
+            buildConfigField STRING, 'DeviceProvisioningServiceIdScope', IOT_DPS_ID_SCOPE
+            buildConfigField STRING, 'CustomAllocationWebhookUrl', CUSTOM_ALLOCATION_POLICY_WEBHOOK
+            buildConfigField STRING, 'FarAwayIotHubConnectionString', FAR_AWAY_IOTHUB_CONNECTION_STRING
             buildConfigField STRING, 'IsBasicTierHub', IS_BASIC_TIER_HUB
         }
     }
