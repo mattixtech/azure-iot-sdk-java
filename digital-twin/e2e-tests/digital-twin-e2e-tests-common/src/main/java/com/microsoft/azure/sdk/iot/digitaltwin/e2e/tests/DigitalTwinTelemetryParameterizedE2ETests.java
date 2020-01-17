@@ -58,52 +58,11 @@ public class DigitalTwinTelemetryParameterizedE2ETests {
     @Parameterized.Parameter(2)
     public Object telemetryValue;
 
-    @Parameterized.Parameters(name = "{index}: Telemetry Test: protocol={0}, telemetry name={1}, telemetry value={2}")
+    @Parameterized.Parameters(name = "{0}_{1}_{2}")
     public static Collection<Object[]> data() {
-        int arrayTelemetrySize = 5;
-        String stringTelemetryValue = "StringTelemetryMessage_".concat(UUID.randomUUID().toString());
-        long milliSecs = System.currentTimeMillis();
-        List<Integer> telemetryIntegerArray = generateRandomIntegerList(arrayTelemetrySize);
-        Map<String, String> telemetryMap = new HashMap<String, String>() {{ put("mapTelemetryKey", "mapTelemetryValue"); }};
-        int telemetryEnum = EnumTelemetry.OFFLINE.getValue();
-        ComplexValueTelemetry telemetryComplexValue = new ComplexValueTelemetry(nextInt(), nextInt(), nextInt());
-
-        int integerValue = nextInt();
-        String stringValue = "ComplexObjectTelemetry_".concat(UUID.randomUUID().toString());
-        List<String> stringArrayValue = generateRandomStringList(arrayTelemetrySize);
-        ComplexObjectTelemetry telemetryComplexObject = new ComplexObjectTelemetry(integerValue, stringValue, stringArrayValue);
-
         Object[][] data = new Object[][] {
                 { MQTT, TELEMETRY_NAME_INTEGER, nextInt() },
                 { MQTT, TELEMETRY_NAME_LONG, nextLong() },
-                { MQTT, TELEMETRY_NAME_DOUBLE, nextDouble() },
-                { MQTT, TELEMETRY_NAME_FLOAT, nextFloat() },
-                { MQTT, TELEMETRY_NAME_BOOLEAN, nextBoolean() },
-                { MQTT, TELEMETRY_NAME_STRING, stringTelemetryValue },
-                { MQTT, TELEMETRY_NAME_DATE, new Date(milliSecs) },
-                { MQTT, TELEMETRY_NAME_TIME, new Time(milliSecs) },
-                { MQTT, TELEMETRY_NAME_DATETIME, new DateTime() },
-                { MQTT, TELEMETRY_NAME_DURATION, Duration.millis(milliSecs) },
-                { MQTT, TELEMETRY_NAME_ARRAY, telemetryIntegerArray },
-                { MQTT, TELEMETRY_NAME_MAP, telemetryMap },
-                { MQTT, TELEMETRY_NAME_ENUM, telemetryEnum },
-                { MQTT, TELEMETRY_NAME_COMPLEX_VALUE, telemetryComplexValue },
-                { MQTT, TELEMETRY_NAME_COMPLEX_OBJECT, telemetryComplexObject },
-                { MQTT_WS, TELEMETRY_NAME_INTEGER, nextInt() },
-                { MQTT_WS, TELEMETRY_NAME_LONG, nextLong() },
-                { MQTT_WS, TELEMETRY_NAME_DOUBLE, nextDouble() },
-                { MQTT_WS, TELEMETRY_NAME_FLOAT, nextFloat() },
-                { MQTT_WS, TELEMETRY_NAME_BOOLEAN, nextBoolean() },
-                { MQTT_WS, TELEMETRY_NAME_STRING, stringTelemetryValue },
-                { MQTT_WS, TELEMETRY_NAME_DATE, new Date(milliSecs) },
-                { MQTT_WS, TELEMETRY_NAME_TIME, new Time(milliSecs) },
-                { MQTT_WS, TELEMETRY_NAME_DATETIME, new DateTime() },
-                { MQTT_WS, TELEMETRY_NAME_DURATION, Duration.millis(milliSecs) },
-                { MQTT_WS, TELEMETRY_NAME_ARRAY, telemetryIntegerArray },
-                { MQTT_WS, TELEMETRY_NAME_MAP, telemetryMap },
-                { MQTT_WS, TELEMETRY_NAME_ENUM, telemetryEnum },
-                { MQTT_WS, TELEMETRY_NAME_COMPLEX_VALUE, telemetryComplexValue },
-                { MQTT_WS, TELEMETRY_NAME_COMPLEX_OBJECT, telemetryComplexObject }
         };
 
         return asList(data);
