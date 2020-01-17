@@ -10,19 +10,29 @@ import com.microsoft.azure.sdk.iot.service.Device;
 import com.microsoft.azure.sdk.iot.service.Module;
 import com.microsoft.azure.sdk.iot.service.RegistryManager;
 import com.microsoft.azure.sdk.iot.service.exceptions.IotHubException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
+@Slf4j
 public class Tools
 {
+    private static final String ANDROID_BUILD_CONFIG_CLASS = "com.iothub.azure.microsoft.com.androide2e.test";
+    private static final Map<String, String> ANDROID_ENV_VAR = retrieveAndroidEnvVariables();
+
     private static final long RETRY_TIMEOUT_ON_NETWORK_FAILURE = 60 * 1000;
     private static final long WAIT_FOR_RETRY = 2000;
 
-    public static String retrieveEnvironmentVariableValue(String environmentVariableName)
+    public static String retrieveEnvironmentVariableValueJvm(String environmentVariableName)
     {
         String environmentVariableValue = System.getenv().get(environmentVariableName);
         if ((environmentVariableValue == null) || environmentVariableValue.isEmpty())
@@ -54,6 +64,41 @@ public class Tools
         {
             return defaultValue;
         }
+    }
+
+    public static String retrieveEnvironmentVariableValue(String environmentVariableName) {
+        String environmentVariableValue;
+        if (ANDROID_ENV_VAR.containsKey(environmentVariableName)) {
+            environmentVariableValue = ANDROID_ENV_VAR.get(environmentVariableName);
+        } else {
+            environmentVariableValue = retrieveEnvironmentVariableValueJvm(environmentVariableName);
+        }
+
+        if (isBlank(environmentVariableValue)) {
+            throw new IllegalArgumentException("Environment variable is not set: " + environmentVariableName);
+        }
+
+        return environmentVariableValue;
+    }
+
+    private static Map<String, String> retrieveAndroidEnvVariables() {
+        Map<String, String> envVariables = new HashMap<>();
+        try {
+            Class buildConfig = Class.forName(ANDROID_BUILD_CONFIG_CLASS);
+            Arrays.stream(buildConfig.getFields()).forEach(field -> {
+                try {
+                    envVariables.put(field.getName(), field.get(null).toString());
+                }
+                catch (IllegalAccessException e) {
+                    log.error("Cannot access the following field: ", e);
+                }
+            });
+        }
+        catch (ClassNotFoundException e) {
+            log.debug("Running the JVM tests");
+        }
+
+        return envVariables;
     }
 
     /**
