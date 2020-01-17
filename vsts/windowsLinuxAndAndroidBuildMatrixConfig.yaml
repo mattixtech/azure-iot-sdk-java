@@ -47,6 +47,17 @@ jobs:
     matrix:
       TestGroupDigitalTwin1:
         ANDROID_TEST_GROUP_ID: TestGroupDigitalTwin1
+      TestGroupDigitalTwin2:
+        ANDROID_TEST_GROUP_ID: TestGroupDigitalTwin2
+      TestGroupDigitalTwin3:
+        ANDROID_TEST_GROUP_ID: TestGroupDigitalTwin3
+      TestGroupDigitalTwin4:
+        ANDROID_TEST_GROUP_ID: TestGroupDigitalTwin4
+      TestGroupDigitalTwin5:
+        ANDROID_TEST_GROUP_ID: TestGroupDigitalTwin5
+      TestGroupDigitalTwin6:
+        ANDROID_TEST_GROUP_ID: TestGroupDigitalTwin6
+
 
   displayName: Android Test  - Digital Twin
   dependsOn: AndroidBuildDigitalTwin
