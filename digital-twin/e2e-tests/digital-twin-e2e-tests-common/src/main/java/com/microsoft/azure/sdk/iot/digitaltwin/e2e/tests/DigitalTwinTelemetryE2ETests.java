@@ -79,82 +79,8 @@ public class DigitalTwinTelemetryE2ETests {
         assertThat(registrationResult).isEqualTo(DigitalTwinClientResult.DIGITALTWIN_CLIENT_OK);
     }
 
-    @Ignore("Disabled until Service starts validating the telemetry payload with telemetry schema.")
-    @Test
-    public void testSendIncompatibleSchemaTelemetry() throws IOException {
-        DigitalTwinClientResult digitalTwinClientResult = testInterfaceInstance.sendTelemetry(TELEMETRY_NAME_INTEGER, nextBoolean()).blockingGet();
-        assertThat(digitalTwinClientResult).isEqualTo(DigitalTwinClientResult.DIGITALTWIN_CLIENT_ERROR);
-    }
-
     @Test
     public void testMultipleThreadsSameInterfaceSameTelemetryNameSendTelemetryAsync() throws IOException, InterruptedException {
-        final Semaphore semaphore = new Semaphore(0);
-        List<Integer> telemetryList = generateRandomIntegerList(MAX_THREADS_MULTITHREADED_TEST);
-
-        telemetryList.forEach(telemetryValue -> {
-            try {
-                testInterfaceInstance.sendTelemetry(TELEMETRY_NAME_INTEGER, telemetryValue)
-                        .subscribe(digitalTwinClientResult -> {
-                            semaphore.release();
-                        });
-            } catch (IOException e) {
-                log.error("Exception thrown while sending telemetryValue={}", telemetryValue, e);
-            }
-        });
-
-        assertThat(semaphore.tryAcquire(MAX_THREADS_MULTITHREADED_TEST, MAX_WAIT_TIME_FOR_ASYNC_CALL_IN_SECONDS, SECONDS)).as("Timeout executing Async call").isTrue();
-
-        for (int i = 0; i < MAX_THREADS_MULTITHREADED_TEST; i++) {
-            String expectedPayload = String.format(TELEMETRY_PAYLOAD_PATTERN, TELEMETRY_NAME_INTEGER, serialize(telemetryList.get(i)));
-            assertThat(verifyThatMessageWasReceived(testDevice.getDeviceId(), expectedPayload)).as("Verify EventHub received the sent telemetry").isTrue();
-        }
-    }
-
-    @Test
-    public void testMultipleThreadsSameInterfaceDifferentTelemetryNameSendTelemetryAsync() throws IOException, InterruptedException {
-        final Semaphore semaphore = new Semaphore(0);
-
-        int intTelemetry = nextInt();
-        boolean booleanTelemetry = nextBoolean();
-
-        Disposable integerTelemetrySubscription = testInterfaceInstance.sendTelemetry(TELEMETRY_NAME_INTEGER, intTelemetry)
-                .subscribe(digitalTwinClientResult -> semaphore.release());
-        Disposable booleanTelemetrySubscription = testInterfaceInstance.sendTelemetry(TELEMETRY_NAME_BOOLEAN, booleanTelemetry)
-                .subscribe(digitalTwinClientResult -> semaphore.release());
-
-        assertThat(semaphore.tryAcquire(2, MAX_WAIT_TIME_FOR_ASYNC_CALL_IN_SECONDS, SECONDS)).as("Timeout executing Async call").isTrue();
-        integerTelemetrySubscription.dispose();
-        booleanTelemetrySubscription.dispose();
-
-        String expectedPayloadResult1 = String.format(TELEMETRY_PAYLOAD_PATTERN, TELEMETRY_NAME_INTEGER, serialize(intTelemetry));
-        assertThat(verifyThatMessageWasReceived(testDevice.getDeviceId(), expectedPayloadResult1)).as("Verify EventHub received the sent telemetry").isTrue();
-        String expectedPayloadResult2 = String.format(TELEMETRY_PAYLOAD_PATTERN, TELEMETRY_NAME_BOOLEAN, serialize(booleanTelemetry));
-        assertThat(verifyThatMessageWasReceived(testDevice.getDeviceId(), expectedPayloadResult2)).as("Verify EventHub received the sent telemetry").isTrue();
-    }
-
-    @Test
-    public void testTelemetryOperationAfterClientCloseAndOpen() throws IOException, InterruptedException {
-        int telemetryValue1 = nextInt();
-        log.debug("Sending telemetry: telemetryName={}, telemetryValue={}", TELEMETRY_NAME_INTEGER, telemetryValue1);
-        DigitalTwinClientResult digitalTwinClientResult1 = testInterfaceInstance.sendTelemetry(TELEMETRY_NAME_INTEGER, telemetryValue1).blockingGet();
-        log.debug("Telemetry operation result: {}", digitalTwinClientResult1);
-
-        String expectedPayload1 = String.format(TELEMETRY_PAYLOAD_PATTERN, TELEMETRY_NAME_INTEGER, serialize(telemetryValue1));
-        assertThat(verifyThatMessageWasReceived(testDevice.getDeviceId(), expectedPayload1)).as("Verify EventHub received the sent telemetry").isTrue();
-
-        // close the device client
-        testDevice.getDeviceClient().closeNow();
-
-        // re-open the client and send telemetry
-        testDevice.getDeviceClient().open();
-
-        int telemetryValue2 = nextInt();
-        log.debug("Sending telemetry: telemetryName={}, telemetryValue={}", TELEMETRY_NAME_INTEGER, telemetryValue2);
-        DigitalTwinClientResult digitalTwinClientResult2 = testInterfaceInstance.sendTelemetry(TELEMETRY_NAME_INTEGER, telemetryValue2).blockingGet();
-        log.debug("Telemetry operation result: {}", digitalTwinClientResult2);
-
-        String expectedPayload2 = String.format(TELEMETRY_PAYLOAD_PATTERN, TELEMETRY_NAME_INTEGER, serialize(telemetryValue2));
-        assertThat(verifyThatMessageWasReceived(testDevice.getDeviceId(), expectedPayload2)).as("Verify EventHub received the sent telemetry").isTrue();
     }
 
     @After
