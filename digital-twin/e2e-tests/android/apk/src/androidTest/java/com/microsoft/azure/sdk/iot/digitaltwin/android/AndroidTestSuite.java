@@ -23,12 +23,7 @@ import org.junit.runners.Suite;
 
 @TestGroupDigitalTwin1
 @RunWith(Suite.class)
-@Suite.SuiteClasses( {DigitalTwinServiceClientE2ETests.class,
-        DigitalTwinRegisterInterfacesE2ETests.class,
-        DigitalTwinTelemetryE2ETests.class,
-        DigitalTwinTelemetryParameterizedE2ETests.class,
-        DigitalTwinPropertiesE2ETests.class,
-        DigitalTwinCommandE2ETests.class})
+@Suite.SuiteClasses( {DigitalTwinCommandE2ETests.class})
 public class AndroidTestSuite {
     @Rule
     public Timeout globalTimeout = Timeout.seconds(5 * 60); // 5 minutes max per method tested
