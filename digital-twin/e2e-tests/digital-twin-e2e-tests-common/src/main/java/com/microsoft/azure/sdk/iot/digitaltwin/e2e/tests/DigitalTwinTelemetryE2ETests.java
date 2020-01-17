@@ -85,8 +85,5 @@ public class DigitalTwinTelemetryE2ETests {
 
     @After
     public void tearDownTest() {
-        if (testDevice != null) {
-            testDevice.closeAndDeleteDevice();
-        }
     }
 }

@@ -72,6 +72,19 @@ public class DigitalTwinPropertiesE2ETests {
         });
     }
 
+    @BeforeClass
+    public static void setUp() {
+        digitalTwinServiceClient = DigitalTwinServiceClientImpl.buildFromConnectionString()
+                .connectionString(IOT_HUB_CONNECTION_STRING)
+                .build();
+    }
+
+    @Before
+    public void setUpTest() throws IotHubException, IOException, URISyntaxException {
+        testDevice = new TestDigitalTwinDevice(DEVICE_ID_PREFIX.concat(UUID.randomUUID().toString()), protocol);
+        DigitalTwinDeviceClient digitalTwinDeviceClient = testDevice.getDigitalTwinDeviceClient();
+    }
+
     @Test
     public void testUpdateSingleWritablePropertyFromService() throws IOException {
     }
