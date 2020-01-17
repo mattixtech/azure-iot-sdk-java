@@ -45,26 +45,8 @@ public class DigitalTwinServiceClientE2ETests {
     @Rule
     public Timeout globalTimeout = Timeout.seconds(5 * 60); // 5 minutes max per method tested
 
-    @BeforeClass
-    public static void setUp() {
-        digitalTwinServiceClient = DigitalTwinServiceClientImpl.buildFromConnectionString()
-                                                               .connectionString(IOT_HUB_CONNECTION_STRING)
-                                                               .build();
-    }
-
-    @Before
-    public void setUpTest() throws IotHubException, IOException, URISyntaxException {
-        testDevice = new TestDigitalTwinDevice(DEVICE_ID_PREFIX.concat(UUID.randomUUID().toString()), MQTT);
-    }
-
     @Test
     public void testGetModelInformationValidModelUrn() {
     }
 
-    @After
-    public void tearDownTest() {
-        if (testDevice != null) {
-            testDevice.closeAndDeleteDevice();
-        }
-    }
 }

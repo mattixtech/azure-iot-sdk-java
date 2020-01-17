@@ -74,21 +74,8 @@ public class DigitalTwinRegisterInterfacesE2ETests {
         });
     }
 
-    @BeforeClass
-    public static void setUp() {
-        digitalTwinServiceClient = DigitalTwinServiceClientImpl.buildFromConnectionString()
-                                                               .connectionString(IOT_HUB_CONNECTION_STRING)
-                                                               .build();
-    }
-
     @Test
     public void testRegisterSingleInterfaceSuccess() throws IotHubException, IOException, URISyntaxException {
     }
 
-    @After
-    public void tearDownTest() {
-        if (testDevice != null) {
-            testDevice.closeAndDeleteDevice();
-        }
-    }
 }
