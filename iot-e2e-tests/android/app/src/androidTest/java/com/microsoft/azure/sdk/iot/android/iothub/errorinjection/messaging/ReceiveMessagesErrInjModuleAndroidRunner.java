@@ -7,7 +7,6 @@ package com.microsoft.azure.sdk.iot.android.iothub.errorinjection.messaging;
 
 import com.microsoft.appcenter.espresso.Factory;
 import com.microsoft.appcenter.espresso.ReportHelper;
-import com.microsoft.azure.sdk.iot.android.BuildConfig;
 import com.microsoft.azure.sdk.iot.android.helper.TestGroup22;
 import com.microsoft.azure.sdk.iot.common.helpers.ClientType;
 import com.microsoft.azure.sdk.iot.common.helpers.Rerun;
@@ -47,9 +46,6 @@ public class ReceiveMessagesErrInjModuleAndroidRunner extends ReceiveMessagesErr
     @Parameterized.Parameters(name = "{0}_{1}_{2}")
     public static Collection inputs() throws IOException, IotHubException, GeneralSecurityException, URISyntaxException, ModuleClientException, InterruptedException
     {
-        iotHubConnectionString = BuildConfig.IotHubConnectionString;
-        isBasicTierHub = Boolean.parseBoolean(BuildConfig.IsBasicTierHub);
-
         if (!isBasicTierHub)
         {
             return inputsCommon(ClientType.MODULE_CLIENT);

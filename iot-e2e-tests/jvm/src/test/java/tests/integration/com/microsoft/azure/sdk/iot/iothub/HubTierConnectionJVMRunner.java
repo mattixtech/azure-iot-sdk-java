@@ -33,8 +33,6 @@ public class HubTierConnectionJVMRunner extends HubTierConnectionTests
     @Parameterized.Parameters(name = "{1} with {3} with proxy? {7}")
     public static Collection inputs() throws Exception
     {
-        iotHubConnectionString = Tools.retrieveEnvironmentVariableValue(TestConstants.IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
-        isBasicTierHub = Boolean.parseBoolean(Tools.retrieveEnvironmentVariableValue(TestConstants.IS_BASIC_TIER_HUB_ENV_VAR_NAME));
         Collection inputs = inputsCommon();
         identities = getIdentities(inputs);
         return inputs;

@@ -23,11 +23,6 @@ public class ServiceClientJVMRunner extends ServiceClientTests
     @Parameterized.Parameters(name = "{0}")
     public static Collection inputsCommon() throws IOException
     {
-        iotHubConnectionString =
-                Tools.retrieveEnvironmentVariableValue(TestConstants.IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
-        isBasicTierHub = Boolean.parseBoolean(Tools.retrieveEnvironmentVariableValue(TestConstants.IS_BASIC_TIER_HUB_ENV_VAR_NAME));
-        invalidCertificateServerConnectionString =
-                Tools.retrieveEnvironmentVariableValue(TestConstants.UNTRUSTWORTHY_IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
         return ServiceClientTests.inputsCommon();
     }
 

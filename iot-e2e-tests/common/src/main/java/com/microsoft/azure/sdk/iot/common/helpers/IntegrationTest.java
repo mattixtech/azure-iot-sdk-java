@@ -39,7 +39,7 @@ public abstract class IntegrationTest
     @Rule
     public Timeout timeout = new Timeout(E2E_TEST_TIMEOUT_MS);
 
-    public static boolean isBasicTierHub;
+    public static boolean isBasicTierHub = Boolean.parseBoolean(Tools.retrieveEnvironmentVariableValue(TestConstants.IS_BASIC_TIER_HUB_ENV_VAR_NAME));
 
     //By default, run all tests. Even if env vars aren't set
     public static boolean runIotHubTests = Boolean.parseBoolean(Tools.retrieveEnvironmentVariableValue("RUN_IOTHUB_TESTS", "true"));

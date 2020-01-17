@@ -33,7 +33,7 @@ import static junit.framework.TestCase.assertTrue;
 
 public class TokenRenewalTests extends IotHubIntegrationTest
 {
-    protected static String iotHubConnectionString;
+    protected static String iotHubConnectionString = Tools.retrieveEnvironmentVariableValue(TestConstants.IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
     private static RegistryManager registryManager;
     protected static HttpProxyServer proxyServer;
     protected static String testProxyHostname = "127.0.0.1";

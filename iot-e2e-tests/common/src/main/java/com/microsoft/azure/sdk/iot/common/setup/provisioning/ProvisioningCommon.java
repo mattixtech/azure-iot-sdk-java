@@ -5,10 +5,7 @@
 
 package com.microsoft.azure.sdk.iot.common.setup.provisioning;
 
-import com.microsoft.azure.sdk.iot.common.helpers.CorrelationDetailsLoggingAssert;
-import com.microsoft.azure.sdk.iot.common.helpers.ProvisioningIntegrationTest;
-import com.microsoft.azure.sdk.iot.common.helpers.Tools;
-import com.microsoft.azure.sdk.iot.common.helpers.X509CertificateGenerator;
+import com.microsoft.azure.sdk.iot.common.helpers.*;
 import com.microsoft.azure.sdk.iot.deps.twin.DeviceCapabilities;
 import com.microsoft.azure.sdk.iot.device.DeviceClient;
 import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
@@ -31,6 +28,7 @@ import com.microsoft.azure.sdk.iot.service.exceptions.IotHubException;
 import junit.framework.AssertionFailedError;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.runners.Parameterized;
 
 import javax.crypto.Mac;
@@ -173,6 +171,19 @@ public class ProvisioningCommon extends ProvisioningIntegrationTest
         registryManager = RegistryManager.createFromConnectionString(iotHubConnectionString);
 
         this.testInstance = new ProvisioningTestInstance(this.testInstance.protocol, this.testInstance.attestationType);
+    }
+
+    @BeforeClass
+    public static void getEnvironmentVariables()
+    {
+        iotHubConnectionString = Tools.retrieveEnvironmentVariableValue(IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
+        isBasicTierHub = Boolean.parseBoolean(Tools.retrieveEnvironmentVariableValue(TestConstants.IS_BASIC_TIER_HUB_ENV_VAR_NAME));
+        provisioningServiceConnectionString = Tools.retrieveEnvironmentVariableValue(DPS_CONNECTION_STRING_ENV_VAR_NAME);
+        provisioningServiceIdScope = Tools.retrieveEnvironmentVariableValue(DPS_ID_SCOPE_ENV_VAR_NAME);
+        farAwayIotHubConnectionString = Tools.retrieveEnvironmentVariableValue(FAR_AWAY_IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
+        customAllocationWebhookUrl = Tools.retrieveEnvironmentVariableValue(CUSTOM_ALLOCATION_WEBHOOK_URL_VAR_NAME);
+        provisioningServiceGlobalEndpointWithInvalidCert = Tools.retrieveEnvironmentVariableValue(DPS_GLOBAL_ENDPOINT_WITH_INVALID_CERT_ENV_VAR_NAME);
+        provisioningServiceWithInvalidCertConnectionString = Tools.retrieveEnvironmentVariableValue(DPS_CONNECTION_STRING_WITH_INVALID_CERT_ENV_VAR_NAME);
     }
 
     @After

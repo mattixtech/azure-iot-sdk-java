@@ -28,8 +28,6 @@ public class SendMessagesJVMRunner extends SendMessagesTests
     @Parameterized.Parameters(name = "{0} with {1} auth using {2} with proxy? {6}")
     public static Collection inputs() throws Exception
     {
-        iotHubConnectionString = Tools.retrieveEnvironmentVariableValue(TestConstants.IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
-        isBasicTierHub = Boolean.parseBoolean(Tools.retrieveEnvironmentVariableValue(TestConstants.IS_BASIC_TIER_HUB_ENV_VAR_NAME));
         if (!isBasicTierHub)
         {
             return inputsCommon();

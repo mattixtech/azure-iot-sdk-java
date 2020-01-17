@@ -7,7 +7,6 @@ package com.microsoft.azure.sdk.iot.android.iothub;
 
 import com.microsoft.appcenter.espresso.Factory;
 import com.microsoft.appcenter.espresso.ReportHelper;
-import com.microsoft.azure.sdk.iot.android.BuildConfig;
 import com.microsoft.azure.sdk.iot.android.helper.TestGroup17;
 import com.microsoft.azure.sdk.iot.common.helpers.Rerun;
 import com.microsoft.azure.sdk.iot.common.tests.iothub.TokenRenewalTests;
@@ -30,8 +29,6 @@ public class TokenRenewalAndroidRunner extends TokenRenewalTests
     @BeforeClass
     public static void setup() throws IOException
     {
-        iotHubConnectionString = BuildConfig.IotHubConnectionString;
-        isBasicTierHub = Boolean.parseBoolean(BuildConfig.IsBasicTierHub);
         TokenRenewalTests.setup();
     }
 

@@ -5,9 +5,7 @@
 
 package com.microsoft.azure.sdk.iot.common.tests.iothub.serviceclient;
 
-import com.microsoft.azure.sdk.iot.common.helpers.ConditionalIgnoreRule;
-import com.microsoft.azure.sdk.iot.common.helpers.IotHubIntegrationTest;
-import com.microsoft.azure.sdk.iot.common.helpers.StandardTierOnlyRule;
+import com.microsoft.azure.sdk.iot.common.helpers.*;
 import com.microsoft.azure.sdk.iot.common.helpers.Tools;
 import com.microsoft.azure.sdk.iot.deps.twin.DeviceCapabilities;
 import com.microsoft.azure.sdk.iot.service.*;
@@ -32,7 +30,7 @@ import static org.junit.Assert.*;
  */
 public class RegistryManagerTests extends IotHubIntegrationTest
 {
-    protected static String iotHubConnectionString = "";
+    protected static String iotHubConnectionString = Tools.retrieveEnvironmentVariableValue(TestConstants.IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
     private static String deviceIdPrefix = "java-crud-e2e-test-";
     private static String moduleIdPrefix = "java-crud-module-e2e-test-";
     private static String configIdPrefix = "java-crud-adm-e2e-test-";

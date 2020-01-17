@@ -43,7 +43,7 @@ public class ReceiveMessagesCommon extends IotHubIntegrationTest
     // variables used in E2E test for sending back to back messages using C2D sendAsync method
     protected static final int MAX_COMMANDS_TO_SEND = 5; // maximum commands to be sent in a loop
 
-    protected static String iotHubConnectionString = "";
+    protected static String iotHubConnectionString = Tools.retrieveEnvironmentVariableValue(TestConstants.IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
     protected static RegistryManager registryManager;
 
     protected static ServiceClient serviceClient;

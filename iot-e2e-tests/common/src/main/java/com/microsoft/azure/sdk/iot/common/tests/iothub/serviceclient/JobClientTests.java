@@ -5,10 +5,7 @@
 
 package com.microsoft.azure.sdk.iot.common.tests.iothub.serviceclient;
 
-import com.microsoft.azure.sdk.iot.common.helpers.DeviceEmulator;
-import com.microsoft.azure.sdk.iot.common.helpers.DeviceTestManager;
-import com.microsoft.azure.sdk.iot.common.helpers.IotHubIntegrationTest;
-import com.microsoft.azure.sdk.iot.common.helpers.Tools;
+import com.microsoft.azure.sdk.iot.common.helpers.*;
 import com.microsoft.azure.sdk.iot.deps.serializer.JobsResponseParser;
 import com.microsoft.azure.sdk.iot.device.DeviceClient;
 import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
@@ -38,8 +35,7 @@ import static org.junit.Assert.*;
  */
 public class JobClientTests extends IotHubIntegrationTest
 {
-    protected static String iotHubConnectionString = "";
-    public static boolean isBasicTierHub;
+    protected static String iotHubConnectionString = Tools.retrieveEnvironmentVariableValue(TestConstants.IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
     private static JobClient jobClient;
     private static RegistryManager registryManager;
 

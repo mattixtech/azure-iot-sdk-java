@@ -2,7 +2,6 @@ package com.microsoft.azure.sdk.iot.android.iothub;
 
 import com.microsoft.appcenter.espresso.Factory;
 import com.microsoft.appcenter.espresso.ReportHelper;
-import com.microsoft.azure.sdk.iot.android.BuildConfig;
 import com.microsoft.azure.sdk.iot.android.helper.TestGroup31;
 import com.microsoft.azure.sdk.iot.common.helpers.Rerun;
 import com.microsoft.azure.sdk.iot.common.tests.iothub.HubTierConnectionTests;
@@ -45,8 +44,6 @@ public class HubTierConnectionAndroidRunner extends HubTierConnectionTests
     @Parameterized.Parameters(name = "{1} with {3} with proxy? {7}")
     public static Collection inputs() throws IOException, IotHubException, GeneralSecurityException, URISyntaxException, ModuleClientException, InterruptedException
     {
-        iotHubConnectionString = BuildConfig.IotHubConnectionString;
-        isBasicTierHub = Boolean.parseBoolean(BuildConfig.IsBasicTierHub);
         Collection inputs = inputsCommon();
         identities = getIdentities(inputs);
         return inputs;

@@ -7,7 +7,6 @@ package com.microsoft.azure.sdk.iot.android.iothub.serviceclient;
 
 import com.microsoft.appcenter.espresso.Factory;
 import com.microsoft.appcenter.espresso.ReportHelper;
-import com.microsoft.azure.sdk.iot.android.BuildConfig;
 import com.microsoft.azure.sdk.iot.android.helper.TestGroup35;
 import com.microsoft.azure.sdk.iot.common.tests.iothub.serviceclient.ExportImportTests;
 import com.microsoft.azure.storage.StorageException;
@@ -31,8 +30,6 @@ public class ExportImportAndroidRunner extends ExportImportTests
     @BeforeClass
     public static void setUp() throws URISyntaxException, InvalidKeyException, StorageException, IOException
     {
-        iotHubConnectionString = BuildConfig.IotHubConnectionString;
-        storageAccountConnectionString = BuildConfig.StorageAccountConnectionString;
         ExportImportTests.setUp();
     }
 

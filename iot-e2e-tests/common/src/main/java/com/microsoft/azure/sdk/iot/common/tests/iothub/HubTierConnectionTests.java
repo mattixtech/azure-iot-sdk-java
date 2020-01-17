@@ -41,7 +41,7 @@ public class HubTierConnectionTests extends IotHubIntegrationTest
     //How many milliseconds between retry
     protected static final Integer RETRY_MILLISECONDS = 100;
 
-    protected static String iotHubConnectionString = "";
+    protected static String iotHubConnectionString = Tools.retrieveEnvironmentVariableValue(TestConstants.IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
     protected static HttpProxyServer proxyServer;
     protected static String testProxyHostname = "127.0.0.1";
     protected static int testProxyPort = 8897;

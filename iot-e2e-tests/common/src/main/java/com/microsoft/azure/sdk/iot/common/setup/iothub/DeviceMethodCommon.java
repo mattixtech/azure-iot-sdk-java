@@ -46,7 +46,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class DeviceMethodCommon extends IotHubIntegrationTest
 {
-    protected static String iotHubConnectionString = "";
+    protected static String iotHubConnectionString = Tools.retrieveEnvironmentVariableValue(TestConstants.IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
 
     protected static DeviceMethod methodServiceClient;
     protected static RegistryManager registryManager;

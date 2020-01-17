@@ -28,8 +28,6 @@ public class TransportClientJVMRunner extends TransportClientTests
     @Parameterized.Parameters(name = "{0}")
     public static Collection inputs() throws Exception
     {
-        iotHubConnectionString = Tools.retrieveEnvironmentVariableValue(TestConstants.IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME);
-        isBasicTierHub = Boolean.parseBoolean(Tools.retrieveEnvironmentVariableValue(TestConstants.IS_BASIC_TIER_HUB_ENV_VAR_NAME));
         return TransportClientTests.inputs();
     }
 }

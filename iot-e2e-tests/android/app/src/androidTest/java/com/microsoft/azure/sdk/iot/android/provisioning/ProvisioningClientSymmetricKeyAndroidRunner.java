@@ -40,15 +40,6 @@ public class ProvisioningClientSymmetricKeyAndroidRunner extends ProvisioningTes
     @Parameterized.Parameters(name = "{0} with {1}")
     public static Collection inputs() throws Exception
     {
-        iotHubConnectionString = BuildConfig.IotHubConnectionString;
-        isBasicTierHub = Boolean.parseBoolean(BuildConfig.IsBasicTierHub);
-        provisioningServiceConnectionString = BuildConfig.DeviceProvisioningServiceConnectionString;
-        provisioningServiceIdScope = BuildConfig.DeviceProvisioningServiceIdScope;
-        provisioningServiceGlobalEndpointWithInvalidCert = BuildConfig.InvalidDeviceProvisioningServiceGlobalEndpoint;
-        provisioningServiceWithInvalidCertConnectionString = BuildConfig.InvalidDeviceProvisioningServiceConnectionString;
-        farAwayIotHubConnectionString = BuildConfig.FarAwayIotHubConnectionString;
-        customAllocationWebhookUrl = BuildConfig.CustomAllocationWebhookUrl;
-
         return ProvisioningCommon.inputs(AttestationType.SYMMETRIC_KEY);
     }
 

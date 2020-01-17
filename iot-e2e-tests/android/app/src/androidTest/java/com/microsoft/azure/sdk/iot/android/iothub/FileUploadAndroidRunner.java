@@ -7,7 +7,6 @@ package com.microsoft.azure.sdk.iot.android.iothub;
 
 import com.microsoft.appcenter.espresso.Factory;
 import com.microsoft.appcenter.espresso.ReportHelper;
-import com.microsoft.azure.sdk.iot.android.BuildConfig;
 import com.microsoft.azure.sdk.iot.android.helper.TestGroup30;
 import com.microsoft.azure.sdk.iot.common.helpers.Rerun;
 import com.microsoft.azure.sdk.iot.common.tests.iothub.FileUploadTests;
@@ -42,8 +41,6 @@ public class FileUploadAndroidRunner extends FileUploadTests
     @Parameterized.Parameters(name = "{0}_{1}_{2}")
     public static Collection inputsCommons() throws Exception
     {
-        iotHubConnectionString = BuildConfig.IotHubConnectionString;
-        isBasicTierHub = Boolean.parseBoolean(BuildConfig.IsBasicTierHub);
         return FileUploadTests.inputs();
     }
 

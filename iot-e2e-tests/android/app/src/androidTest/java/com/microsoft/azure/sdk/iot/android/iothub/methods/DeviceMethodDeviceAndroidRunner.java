@@ -7,7 +7,6 @@ package com.microsoft.azure.sdk.iot.android.iothub.methods;
 
 import com.microsoft.appcenter.espresso.Factory;
 import com.microsoft.appcenter.espresso.ReportHelper;
-import com.microsoft.azure.sdk.iot.android.BuildConfig;
 import com.microsoft.azure.sdk.iot.android.helper.TestGroup3;
 import com.microsoft.azure.sdk.iot.common.helpers.ClientType;
 import com.microsoft.azure.sdk.iot.common.helpers.Rerun;
@@ -46,9 +45,6 @@ public class DeviceMethodDeviceAndroidRunner extends DeviceMethodTests
     @Parameterized.Parameters(name = "{0}_{1}_{2}")
     public static Collection inputsCommons() throws IOException, IotHubException, GeneralSecurityException, URISyntaxException, InterruptedException, ModuleClientException
     {
-        iotHubConnectionString = BuildConfig.IotHubConnectionString;
-        isBasicTierHub = Boolean.parseBoolean(BuildConfig.IsBasicTierHub);
-
         return inputsCommon(ClientType.DEVICE_CLIENT);
     }
 

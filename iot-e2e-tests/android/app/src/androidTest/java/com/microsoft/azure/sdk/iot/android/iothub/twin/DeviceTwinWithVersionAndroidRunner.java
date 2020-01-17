@@ -7,7 +7,6 @@ package com.microsoft.azure.sdk.iot.android.iothub.twin;
 
 import com.microsoft.appcenter.espresso.Factory;
 import com.microsoft.appcenter.espresso.ReportHelper;
-import com.microsoft.azure.sdk.iot.android.BuildConfig;
 import com.microsoft.azure.sdk.iot.android.helper.TestGroup21;
 import com.microsoft.azure.sdk.iot.common.tests.iothub.twin.DeviceTwinWithVersionTests;
 import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
@@ -36,8 +35,6 @@ public class DeviceTwinWithVersionAndroidRunner extends DeviceTwinWithVersionTes
     @Parameterized.Parameters(name = "{0}")
     public static Collection inputs() throws IOException
     {
-        iotHubConnectionString = BuildConfig.IotHubConnectionString;
-        isBasicTierHub = Boolean.parseBoolean(BuildConfig.IsBasicTierHub);
         return inputsCommon();
     }
 
