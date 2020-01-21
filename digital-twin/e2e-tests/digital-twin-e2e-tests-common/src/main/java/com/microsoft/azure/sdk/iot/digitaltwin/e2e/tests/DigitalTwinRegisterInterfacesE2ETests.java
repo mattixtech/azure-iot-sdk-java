@@ -3,6 +3,7 @@
 
 package com.microsoft.azure.sdk.iot.digitaltwin.e2e.tests;
 
+import com.microsoft.azure.sdk.iot.device.DeviceClient;
 import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
 import com.microsoft.azure.sdk.iot.digitaltwin.device.DigitalTwinClientResult;
 import com.microsoft.azure.sdk.iot.digitaltwin.device.DigitalTwinDeviceClient;
@@ -12,6 +13,8 @@ import com.microsoft.azure.sdk.iot.digitaltwin.e2e.simulator.TestInterfaceInstan
 import com.microsoft.azure.sdk.iot.digitaltwin.e2e.simulator.UnpublishedInterfaceInstance;
 import com.microsoft.azure.sdk.iot.digitaltwin.service.DigitalTwinServiceClient;
 import com.microsoft.azure.sdk.iot.digitaltwin.service.DigitalTwinServiceClientImpl;
+import com.microsoft.azure.sdk.iot.service.Device;
+import com.microsoft.azure.sdk.iot.service.RegistryManager;
 import com.microsoft.azure.sdk.iot.service.exceptions.IotHubException;
 import io.reactivex.rxjava3.disposables.Disposable;
 import org.junit.After;
@@ -37,6 +40,7 @@ import static com.microsoft.azure.sdk.iot.digitaltwin.device.DigitalTwinClientRe
 import static com.microsoft.azure.sdk.iot.digitaltwin.e2e.helpers.E2ETestConstants.*;
 import static com.microsoft.azure.sdk.iot.digitaltwin.e2e.helpers.Tools.retrieveEnvironmentVariableValue;
 import static com.microsoft.azure.sdk.iot.digitaltwin.e2e.helpers.Tools.retrieveInterfaceNameFromInterfaceId;
+import static com.microsoft.azure.sdk.iot.service.auth.AuthenticationType.SAS;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.synchronizedList;
@@ -76,6 +80,16 @@ public class DigitalTwinRegisterInterfacesE2ETests {
 
     @Test
     public void testRegisterSingleInterfaceSuccess() throws IotHubException, IOException, URISyntaxException {
+        if (!protocol.equals(MQTT) && !protocol.equals(MQTT_WS)) {
+            throw new IllegalArgumentException("Supported protocols for DigitalTwin are MQTT, MQTT_WS");
+        }
+        String deviceId = DEVICE_ID_PREFIX.concat(UUID.randomUUID().toString());
+        RegistryManager registryManager = RegistryManager.createFromConnectionString(IOT_HUB_CONNECTION_STRING);
+
+        Device device = Device.createDevice(deviceId, SAS);
+        Device registeredDevice = registryManager.addDevice(device);
+        String deviceConnectionString = registryManager.getDeviceConnectionString(registeredDevice);
+        registryManager.close();
     }
 
 }

@@ -6,6 +6,8 @@ package com.microsoft.azure.sdk.iot.digitaltwin.e2e.tests;
 import com.microsoft.azure.sdk.iot.digitaltwin.e2e.simulator.TestDigitalTwinDevice;
 import com.microsoft.azure.sdk.iot.digitaltwin.service.DigitalTwinServiceClient;
 import com.microsoft.azure.sdk.iot.digitaltwin.service.DigitalTwinServiceClientImpl;
+import com.microsoft.azure.sdk.iot.service.Device;
+import com.microsoft.azure.sdk.iot.service.RegistryManager;
 import com.microsoft.azure.sdk.iot.service.exceptions.IotHubException;
 import com.microsoft.rest.RestException;
 import org.junit.After;
@@ -21,12 +23,14 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static com.microsoft.azure.sdk.iot.device.IotHubClientProtocol.MQTT;
+import static com.microsoft.azure.sdk.iot.device.IotHubClientProtocol.MQTT_WS;
 import static com.microsoft.azure.sdk.iot.digitaltwin.e2e.helpers.E2ETestConstants.DCM_ID;
 import static com.microsoft.azure.sdk.iot.digitaltwin.e2e.helpers.E2ETestConstants.IOT_HUB_CONNECTION_STRING_ENV_VAR_NAME;
 import static com.microsoft.azure.sdk.iot.digitaltwin.e2e.helpers.Tools.retrieveEnvironmentVariableValue;
 import static com.microsoft.azure.sdk.iot.digitaltwin.e2e.helpers.Tools.retrieveInterfaceNameFromInterfaceId;
 import static com.microsoft.azure.sdk.iot.digitaltwin.e2e.simulator.TestInterfaceInstance2.SYNC_COMMAND_WITH_PAYLOAD;
 import static com.microsoft.azure.sdk.iot.digitaltwin.e2e.simulator.TestInterfaceInstance2.TEST_INTERFACE_ID;
+import static com.microsoft.azure.sdk.iot.service.auth.AuthenticationType.SAS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DigitalTwinServiceClientE2ETests {
@@ -46,7 +50,9 @@ public class DigitalTwinServiceClientE2ETests {
     public Timeout globalTimeout = Timeout.seconds(5 * 60); // 5 minutes max per method tested
 
     @Test
-    public void testGetModelInformationValidModelUrn() {
+    public void testGetModelInformationValidModelUrn() throws IOException {
+        String deviceId = DEVICE_ID_PREFIX.concat(UUID.randomUUID().toString());
+        RegistryManager registryManager = RegistryManager.createFromConnectionString(IOT_HUB_CONNECTION_STRING);
     }
 
 }

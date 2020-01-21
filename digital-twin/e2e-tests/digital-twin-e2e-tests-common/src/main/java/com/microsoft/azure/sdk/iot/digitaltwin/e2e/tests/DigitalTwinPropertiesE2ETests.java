@@ -5,6 +5,7 @@ package com.microsoft.azure.sdk.iot.digitaltwin.e2e.tests;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.microsoft.azure.sdk.iot.device.DeviceClient;
 import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
 import com.microsoft.azure.sdk.iot.digitaltwin.device.DigitalTwinClientResult;
 import com.microsoft.azure.sdk.iot.digitaltwin.device.DigitalTwinDeviceClient;
@@ -14,6 +15,8 @@ import com.microsoft.azure.sdk.iot.digitaltwin.service.DigitalTwinServiceAsyncCl
 import com.microsoft.azure.sdk.iot.digitaltwin.service.DigitalTwinServiceAsyncClientImpl;
 import com.microsoft.azure.sdk.iot.digitaltwin.service.DigitalTwinServiceClient;
 import com.microsoft.azure.sdk.iot.digitaltwin.service.DigitalTwinServiceClientImpl;
+import com.microsoft.azure.sdk.iot.service.Device;
+import com.microsoft.azure.sdk.iot.service.RegistryManager;
 import com.microsoft.azure.sdk.iot.service.exceptions.IotHubException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.*;
@@ -33,6 +36,7 @@ import static com.microsoft.azure.sdk.iot.digitaltwin.device.DigitalTwinClientRe
 import static com.microsoft.azure.sdk.iot.digitaltwin.e2e.helpers.E2ETestConstants.*;
 import static com.microsoft.azure.sdk.iot.digitaltwin.e2e.helpers.Tools.*;
 import static com.microsoft.azure.sdk.iot.digitaltwin.e2e.simulator.TestInterfaceInstance2.*;
+import static com.microsoft.azure.sdk.iot.service.auth.AuthenticationType.SAS;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
@@ -81,11 +85,26 @@ public class DigitalTwinPropertiesE2ETests {
 
     @Before
     public void setUpTest() throws IotHubException, IOException, URISyntaxException {
-        testDevice = new TestDigitalTwinDevice(DEVICE_ID_PREFIX.concat(UUID.randomUUID().toString()), protocol);
-        DigitalTwinDeviceClient digitalTwinDeviceClient = testDevice.getDigitalTwinDeviceClient();
     }
 
     @Test
-    public void testUpdateSingleWritablePropertyFromService() throws IOException {
+    public void testUpdateSingleWritablePropertyFromService() throws IOException, URISyntaxException, IotHubException {
+        if (!protocol.equals(MQTT) && !protocol.equals(MQTT_WS)) {
+            throw new IllegalArgumentException("Supported protocols for DigitalTwin are MQTT, MQTT_WS");
+        }
+        String deviceId = DEVICE_ID_PREFIX.concat(UUID.randomUUID().toString());
+        RegistryManager registryManager = RegistryManager.createFromConnectionString(IOT_HUB_CONNECTION_STRING);
+
+        Device device = Device.createDevice(deviceId, SAS);
+        Device registeredDevice = registryManager.addDevice(device);
+        String deviceConnectionString = registryManager.getDeviceConnectionString(registeredDevice);
+        registryManager.close();
+
+        DeviceClient deviceClient = new DeviceClient(deviceConnectionString, protocol);
+        deviceClient.registerConnectionStatusChangeCallback((iotHubConnectionStatus, iotHubConnectionStatusChangeReason, throwable, o) -> {
+            TestDigitalTwinDevice testDigitalTwinDevice = (TestDigitalTwinDevice) o;
+            log.debug("DeviceID={}; status={}, reason={}", testDigitalTwinDevice.getDeviceId(), iotHubConnectionStatus, iotHubConnectionStatusChangeReason);
+        }, this);
+        log.debug("Created device: {}", deviceId);
     }
 }
