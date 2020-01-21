@@ -5,6 +5,9 @@ package com.microsoft.azure.sdk.iot.digitaltwin.e2e.tests;
 
 import com.microsoft.azure.sdk.iot.device.DeviceClient;
 import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
+import com.microsoft.azure.sdk.iot.device.IotHubConnectionStatusChangeCallback;
+import com.microsoft.azure.sdk.iot.device.IotHubConnectionStatusChangeReason;
+import com.microsoft.azure.sdk.iot.device.transport.IotHubConnectionStatus;
 import com.microsoft.azure.sdk.iot.digitaltwin.device.DigitalTwinClientResult;
 import com.microsoft.azure.sdk.iot.digitaltwin.device.DigitalTwinDeviceClient;
 import com.microsoft.azure.sdk.iot.digitaltwin.e2e.simulator.TestDigitalTwinDevice;
@@ -78,6 +81,15 @@ public class DigitalTwinRegisterInterfacesE2ETests {
         });
     }
 
+    private class IotHubConnectionStatusLogger implements IotHubConnectionStatusChangeCallback
+    {
+
+        @Override
+        public void execute(IotHubConnectionStatus status, IotHubConnectionStatusChangeReason statusChangeReason, Throwable throwable, Object callbackContext) {
+            System.out.println("status=" + status +", reason=" + statusChangeReason);
+        }
+    }
+
     @Test
     public void testRegisterSingleInterfaceSuccess() throws IotHubException, IOException, URISyntaxException {
         if (!protocol.equals(MQTT) && !protocol.equals(MQTT_WS)) {
@@ -91,7 +103,7 @@ public class DigitalTwinRegisterInterfacesE2ETests {
         String deviceConnectionString = registryManager.getDeviceConnectionString(registeredDevice);
         registryManager.close();
         DeviceClient deviceClient = new DeviceClient(deviceConnectionString, protocol);
-
+        deviceClient.registerConnectionStatusChangeCallback(new IotHubConnectionStatusLogger(), null);
     }
 
 }
