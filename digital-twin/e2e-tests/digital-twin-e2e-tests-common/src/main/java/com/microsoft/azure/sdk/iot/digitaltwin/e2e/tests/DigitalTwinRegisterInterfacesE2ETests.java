@@ -90,6 +90,8 @@ public class DigitalTwinRegisterInterfacesE2ETests {
         Device registeredDevice = registryManager.addDevice(device);
         String deviceConnectionString = registryManager.getDeviceConnectionString(registeredDevice);
         registryManager.close();
+        DeviceClient deviceClient = new DeviceClient(deviceConnectionString, protocol);
+
     }
 
 }

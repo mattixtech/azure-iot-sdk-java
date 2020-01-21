@@ -105,6 +105,6 @@ public class DigitalTwinPropertiesE2ETests {
             TestDigitalTwinDevice testDigitalTwinDevice = (TestDigitalTwinDevice) o;
             log.debug("DeviceID={}; status={}, reason={}", testDigitalTwinDevice.getDeviceId(), iotHubConnectionStatus, iotHubConnectionStatusChangeReason);
         }, this);
-        log.debug("Created device: {}", deviceId);
+
     }
 }
