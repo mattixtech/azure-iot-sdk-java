@@ -5,6 +5,9 @@ package com.microsoft.azure.sdk.iot.digitaltwin.e2e.tests;
 
 import com.microsoft.azure.sdk.iot.device.DeviceClient;
 import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
+import com.microsoft.azure.sdk.iot.device.IotHubConnectionStatusChangeCallback;
+import com.microsoft.azure.sdk.iot.device.IotHubConnectionStatusChangeReason;
+import com.microsoft.azure.sdk.iot.device.transport.IotHubConnectionStatus;
 import com.microsoft.azure.sdk.iot.digitaltwin.device.DigitalTwinClientResult;
 import com.microsoft.azure.sdk.iot.digitaltwin.device.DigitalTwinDeviceClient;
 import com.microsoft.azure.sdk.iot.digitaltwin.e2e.simulator.TestDigitalTwinDevice;
@@ -113,8 +116,11 @@ public class DigitalTwinCommandE2ETests {
         registryManager.close();
 
         DeviceClient deviceClient = new DeviceClient(deviceConnectionString, protocol);
-        deviceClient.registerConnectionStatusChangeCallback((iotHubConnectionStatus, iotHubConnectionStatusChangeReason, throwable, o) -> {
-            log.debug("status={}, reason={}", iotHubConnectionStatus, iotHubConnectionStatusChangeReason);
+        deviceClient.registerConnectionStatusChangeCallback(new IotHubConnectionStatusChangeCallback() {
+            @Override
+            public void execute(IotHubConnectionStatus status, IotHubConnectionStatusChangeReason statusChangeReason, Throwable throwable, Object callbackContext) {
+                log.debug("status={}, reason={}", status, statusChangeReason);
+            }
         }, null);
         DigitalTwinDeviceClient digitalTwinDeviceClient = new DigitalTwinDeviceClient(deviceClient);
         log.debug("Created device: {}", deviceId);
