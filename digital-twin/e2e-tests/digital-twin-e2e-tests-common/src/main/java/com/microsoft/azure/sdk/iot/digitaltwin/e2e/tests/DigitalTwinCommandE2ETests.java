@@ -119,11 +119,8 @@ public class DigitalTwinCommandE2ETests {
         deviceClient.registerConnectionStatusChangeCallback(new IotHubConnectionStatusChangeCallback() {
             @Override
             public void execute(IotHubConnectionStatus status, IotHubConnectionStatusChangeReason statusChangeReason, Throwable throwable, Object callbackContext) {
-                log.debug("status={}, reason={}", status, statusChangeReason);
             }
         }, null);
-        DigitalTwinDeviceClient digitalTwinDeviceClient = new DigitalTwinDeviceClient(deviceClient);
-        log.debug("Created device: {}", deviceId);
     }
 
     @After
