@@ -7,6 +7,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.azure.sdk.iot.device.DeviceClient;
 import com.microsoft.azure.sdk.iot.device.IotHubClientProtocol;
+import com.microsoft.azure.sdk.iot.device.IotHubConnectionStatusChangeCallback;
+import com.microsoft.azure.sdk.iot.device.IotHubConnectionStatusChangeReason;
+import com.microsoft.azure.sdk.iot.device.transport.IotHubConnectionStatus;
 import com.microsoft.azure.sdk.iot.digitaltwin.device.DigitalTwinClientResult;
 import com.microsoft.azure.sdk.iot.digitaltwin.device.DigitalTwinDeviceClient;
 import com.microsoft.azure.sdk.iot.digitaltwin.e2e.simulator.TestDigitalTwinDevice;
@@ -101,10 +104,6 @@ public class DigitalTwinPropertiesE2ETests {
         registryManager.close();
 
         DeviceClient deviceClient = new DeviceClient(deviceConnectionString, protocol);
-        deviceClient.registerConnectionStatusChangeCallback((iotHubConnectionStatus, iotHubConnectionStatusChangeReason, throwable, o) -> {
-            TestDigitalTwinDevice testDigitalTwinDevice = (TestDigitalTwinDevice) o;
-            log.debug("DeviceID={}; status={}, reason={}", testDigitalTwinDevice.getDeviceId(), iotHubConnectionStatus, iotHubConnectionStatusChangeReason);
-        }, this);
 
     }
 }

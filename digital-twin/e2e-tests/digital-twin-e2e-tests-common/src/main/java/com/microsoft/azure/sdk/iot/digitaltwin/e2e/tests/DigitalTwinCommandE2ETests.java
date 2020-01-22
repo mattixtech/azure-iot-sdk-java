@@ -116,11 +116,11 @@ public class DigitalTwinCommandE2ETests {
         registryManager.close();
 
         DeviceClient deviceClient = new DeviceClient(deviceConnectionString, protocol);
-        deviceClient.registerConnectionStatusChangeCallback(new IotHubConnectionStatusChangeCallback() {
+        new IotHubConnectionStatusChangeCallback() {
             @Override
             public void execute(IotHubConnectionStatus status, IotHubConnectionStatusChangeReason statusChangeReason, Throwable throwable, Object callbackContext) {
             }
-        }, null);
+        };
     }
 
     @After
