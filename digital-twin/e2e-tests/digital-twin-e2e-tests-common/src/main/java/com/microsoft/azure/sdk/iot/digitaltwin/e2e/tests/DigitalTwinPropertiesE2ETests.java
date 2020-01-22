@@ -92,18 +92,5 @@ public class DigitalTwinPropertiesE2ETests {
 
     @Test
     public void testUpdateSingleWritablePropertyFromService() throws IOException, URISyntaxException, IotHubException {
-        if (!protocol.equals(MQTT) && !protocol.equals(MQTT_WS)) {
-            throw new IllegalArgumentException("Supported protocols for DigitalTwin are MQTT, MQTT_WS");
-        }
-        String deviceId = DEVICE_ID_PREFIX.concat(UUID.randomUUID().toString());
-        RegistryManager registryManager = RegistryManager.createFromConnectionString(IOT_HUB_CONNECTION_STRING);
-
-        Device device = Device.createDevice(deviceId, SAS);
-        Device registeredDevice = registryManager.addDevice(device);
-        String deviceConnectionString = registryManager.getDeviceConnectionString(registeredDevice);
-        registryManager.close();
-
-        DeviceClient deviceClient = new DeviceClient(deviceConnectionString, protocol);
-
     }
 }
