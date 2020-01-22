@@ -81,9 +81,7 @@ public class DigitalTwinPropertiesE2ETests {
 
     @BeforeClass
     public static void setUp() {
-        digitalTwinServiceClient = DigitalTwinServiceClientImpl.buildFromConnectionString()
-                .connectionString(IOT_HUB_CONNECTION_STRING)
-                .build();
+
     }
 
     @Before
