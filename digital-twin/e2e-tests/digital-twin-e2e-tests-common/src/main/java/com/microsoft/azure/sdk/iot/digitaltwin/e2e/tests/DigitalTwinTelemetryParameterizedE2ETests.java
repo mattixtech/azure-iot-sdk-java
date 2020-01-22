@@ -119,7 +119,6 @@ public class DigitalTwinTelemetryParameterizedE2ETests {
 
     @Test
     public void testSendTelemetryDifferentSchema() throws IOException, InterruptedException, URISyntaxException, IotHubException {
-        testDevice = new TestDigitalTwinDevice(DEVICE_ID_PREFIX.concat(UUID.randomUUID().toString()), protocol);
 
     }
 

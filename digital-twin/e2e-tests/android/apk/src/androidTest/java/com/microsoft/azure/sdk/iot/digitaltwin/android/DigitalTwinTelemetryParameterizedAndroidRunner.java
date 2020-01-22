@@ -16,14 +16,12 @@ import org.junit.Rule;
 import org.junit.rules.Timeout;
 
 @TestGroupDigitalTwin6
-public class DigitalTwinTelemetryParamaterizedAndroidRunner extends DigitalTwinTelemetryParameterizedE2ETests {
+public class DigitalTwinTelemetryParameterizedAndroidRunner extends DigitalTwinTelemetryParameterizedE2ETests {
     @Rule
     public Timeout globalTimeout = Timeout.seconds(5 * 60); // 5 minutes max per method tested
 
     @Rule
     public ReportHelper reportHelper = Factory.getReportHelper();
-
-    //TODO implement an abstact method here for getting env var for iothub con string and eventhub con string
 
     @After
     public void labelSnapshot()
