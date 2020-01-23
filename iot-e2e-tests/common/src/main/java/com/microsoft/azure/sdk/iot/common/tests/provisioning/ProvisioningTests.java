@@ -52,13 +52,65 @@ public class ProvisioningTests extends ProvisioningCommon
     }
 
     @Test
+    @ConditionalIgnoreRule.ConditionalIgnore(condition = StandardTierOnlyRule.class)
+    public void individualEnrollmentReprovisioningCanKeepTwin() throws Exception
+    {
+        ReprovisionPolicy reprovisionPolicy = new ReprovisionPolicy();
+        reprovisionPolicy.setMigrateDeviceData(true);
+        reprovisionPolicy.setUpdateHubAssignment(true);
+
+        reprovisioningFlow(EnrollmentType.INDIVIDUAL, null, reprovisionPolicy, null, getStartingHubs(), getHubsToReprovisionTo());
+    }
+
+    @Test
+    @ConditionalIgnoreRule.ConditionalIgnore(condition = StandardTierOnlyRule.class)
+    public void individualEnrollmentReprovisioningCanResetTwin() throws Exception
+    {
+        if (testInstance.attestationType == AttestationType.TPM)
+        {
+            return;
+        }
+
+        ReprovisionPolicy reprovisionPolicy = new ReprovisionPolicy();
+        reprovisionPolicy.setMigrateDeviceData(false);
+        reprovisionPolicy.setUpdateHubAssignment(true);
+
+        reprovisioningFlow(EnrollmentType.INDIVIDUAL, null, reprovisionPolicy, null, getStartingHubs(), getHubsToReprovisionTo());
+    }
+
+    @Test
+    public void individualEnrollmentCanBlockReprovisioning() throws Exception
+    {
+        if (testInstance.attestationType == AttestationType.TPM)
+        {
+            return;
+        }
+
+        ReprovisionPolicy reprovisionPolicy = new ReprovisionPolicy();
+        reprovisionPolicy.setUpdateHubAssignment(false);
+
+        reprovisioningFlow(EnrollmentType.INDIVIDUAL, null, reprovisionPolicy, null, getStartingHubs(), getHubsToReprovisionTo());
+    }
+
+    @Test
+    public void individualEnrollmentWithCustomAllocationPolicy() throws Exception
+    {
+        customAllocationFlow(EnrollmentType.INDIVIDUAL);
+    }
+
+    @Test
     public void individualEnrollmentWithInvalidRemoteServerCertificateFails() throws Exception
     {
+        if (testInstance.attestationType == AttestationType.TPM)
+        {
+            return;
+        }
+
         enrollmentWithInvalidRemoteServerCertificateFails(EnrollmentType.INDIVIDUAL);
     }
 
     @Test
-    public void ProvisioningWithCustomPayloadFlow() throws Exception
+    public void individualEnrollmentWithCustomPayload() throws Exception
     {
         String jsonPayload = "{\"a\":\"b\"}";
         String expectedHubToProvisionTo;
@@ -131,43 +183,6 @@ public class ProvisioningTests extends ProvisioningCommon
     public void groupEnrollmentWithCustomAllocationPolicy() throws Exception
     {
         customAllocationFlow(EnrollmentType.GROUP);
-    }
-
-    @Test
-    @ConditionalIgnoreRule.ConditionalIgnore(condition = StandardTierOnlyRule.class)
-    public void individualEnrollmentReprovisioningCanKeepTwin() throws Exception
-    {
-        ReprovisionPolicy reprovisionPolicy = new ReprovisionPolicy();
-        reprovisionPolicy.setMigrateDeviceData(true);
-        reprovisionPolicy.setUpdateHubAssignment(true);
-
-        reprovisioningFlow(EnrollmentType.INDIVIDUAL, null, reprovisionPolicy, null, getStartingHubs(), getHubsToReprovisionTo());
-    }
-
-    @Test
-    @ConditionalIgnoreRule.ConditionalIgnore(condition = StandardTierOnlyRule.class)
-    public void individualEnrollmentReprovisioningCanResetTwin() throws Exception
-    {
-        ReprovisionPolicy reprovisionPolicy = new ReprovisionPolicy();
-        reprovisionPolicy.setMigrateDeviceData(false);
-        reprovisionPolicy.setUpdateHubAssignment(true);
-
-        reprovisioningFlow(EnrollmentType.INDIVIDUAL, null, reprovisionPolicy, null, getStartingHubs(), getHubsToReprovisionTo());
-    }
-
-    @Test
-    public void individualEnrollmentCanBlockReprovisioning() throws Exception
-    {
-        ReprovisionPolicy reprovisionPolicy = new ReprovisionPolicy();
-        reprovisionPolicy.setUpdateHubAssignment(false);
-
-        reprovisioningFlow(EnrollmentType.INDIVIDUAL, null, reprovisionPolicy, null, getStartingHubs(), getHubsToReprovisionTo());
-    }
-
-    @Test
-    public void individualEnrollmentWithCustomAllocationPolicy() throws Exception
-    {
-        customAllocationFlow(EnrollmentType.INDIVIDUAL);
     }
 
     /***
