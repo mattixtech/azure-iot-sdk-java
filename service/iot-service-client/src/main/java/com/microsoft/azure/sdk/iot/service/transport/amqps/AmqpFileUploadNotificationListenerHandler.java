@@ -78,7 +78,7 @@ public class AmqpFileUploadNotificationListenerHandler extends AmqpConnectionHan
     }
 
     @Override
-    public void onMessageAcknowledged(DeliveryState deliveryState)
+    public void onMessageAcknowledged(MessageSentCallback.AcknowledgementState acknowledgementState, String statusCode, String statusDescription, int deliveryTag)
     {
         //Never called, do nothing
     }

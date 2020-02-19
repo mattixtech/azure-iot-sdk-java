@@ -7,21 +7,21 @@ package com.microsoft.azure.sdk.iot.service.transport.amqps;
 
 import com.microsoft.azure.sdk.iot.service.DeliveryOutcome;
 import com.microsoft.azure.sdk.iot.service.IotHubServiceClientProtocol;
-import com.microsoft.azure.sdk.iot.service.Tools;
-import com.microsoft.azure.sdk.iot.service.exceptions.IotHubException;
+import com.microsoft.azure.sdk.iot.service.MessageSentCallback;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.proton.Proton;
 import org.apache.qpid.proton.amqp.Binary;
 import org.apache.qpid.proton.amqp.Symbol;
 import org.apache.qpid.proton.amqp.messaging.*;
-import org.apache.qpid.proton.amqp.transport.DeliveryState;
 import org.apache.qpid.proton.engine.*;
 import org.apache.qpid.proton.message.Message;
 
-import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Instance of the QPID-Proton-J BaseHandler class to override
@@ -38,11 +38,11 @@ public class AmqpSendHandler extends AmqpConnectionHandler
     public static final String DEVICE_PATH_FORMAT = "/devices/%s/messages/devicebound";
     public static final String MODULE_PATH_FORMAT = "/devices/%s/modules/%s/messages/devicebound";
     private static final String THREAD_POSTFIX_NAME = "SendHandler";
-    private AmqpResponseVerification deliveryAcknowledgement;
-    private org.apache.qpid.proton.message.Message messageToBeSent;
+    private Queue<TransportMessage> messageQueue;
+    private final Map<Integer, TransportMessage> inProgressMessages;
     private static final int expectedLinkCount = 1;
-    private AmqpSendHandlerMessageSentCallback callback;
     private Sender cloudToDeviceMessageSender;
+    private static final int SEND_MESSAGES_PERIOD_MILLIS = 50; //every 50 milliseconds, the method onTimerTask will fire to send queued messages
 
     /**
      * Constructor to set up connection parameters and initialize handshaker for transport
@@ -50,48 +50,37 @@ public class AmqpSendHandler extends AmqpConnectionHandler
      * @param hostName The address string of the service (example: AAA.BBB.CCC)
      * @param userName The username string to use SASL authentication (example: user@sas.service)
      * @param iotHubServiceClientProtocol protocol to use
-     * @param callback the callback to be executed when the message has been sent
      */
-    public AmqpSendHandler(String hostName, String userName, IotHubServiceClientProtocol iotHubServiceClientProtocol, AmqpSendHandlerMessageSentCallback callback)
+    public AmqpSendHandler(String hostName, String userName, IotHubServiceClientProtocol iotHubServiceClientProtocol)
     {
         super(hostName, userName, iotHubServiceClientProtocol, SEND_TAG, ENDPOINT, expectedLinkCount);
 
-        Tools.throwIfNull(callback, "Callback cannot be null");
-        this.callback = callback;
+        this.messageQueue = new ConcurrentLinkedQueue<>();
+        this.inProgressMessages = new ConcurrentHashMap<>();
     }
 
     /**
-     * Create Proton message from deviceId and content string
+     * Queue the provided message so that it is sent to the provided device
      * @param deviceId The device name string
-     * @param message The message to be sent
+     * @param message The message to be sent to the device
      */
-    public void createProtonMessage(String deviceId, com.microsoft.azure.sdk.iot.service.Message message)
+    public void queueMessage(com.microsoft.azure.sdk.iot.service.Message message, String deviceId, MessageSentCallback messageSentCallback, Object context)
     {
-        populateProtonMessage(String.format(DEVICE_PATH_FORMAT, deviceId), message);
+        this.messageQueue.add(new TransportMessage(deviceId, null, message, messageSentCallback, context));
     }
 
     /**
-     * Create Proton message from deviceId and content string
-     * @param deviceId The device name string
-     * @param moduleId The device name string
-     * @param message The message to be sent
+     * Queue the provided message so that it is sent to the provided module in the provided device
+     * @param deviceId The device identifier
+     * @param moduleId The module identifier
+     * @param message The message to be sent to the module
      */
-    public void createProtonMessage(String deviceId, String moduleId, com.microsoft.azure.sdk.iot.service.Message message)
+    public void queueMessage(com.microsoft.azure.sdk.iot.service.Message message, String deviceId, String moduleId, MessageSentCallback messageSentCallback, Object context)
     {
-        populateProtonMessage(String.format(MODULE_PATH_FORMAT, deviceId, moduleId), message);
+        this.messageQueue.add(new TransportMessage(deviceId, moduleId, message, messageSentCallback, context));
     }
 
-    public void validateConnectionWasSuccessful() throws IotHubException, IOException
-    {
-        super.validateConnectionWasSuccessful();
-
-        if (deliveryAcknowledgement != null && deliveryAcknowledgement.getException() != null)
-        {
-            throw deliveryAcknowledgement.getException();
-        }
-    }
-
-    private void populateProtonMessage(String targetPath, com.microsoft.azure.sdk.iot.service.Message message)
+    private Message convertToProtonMessage(String targetPath, com.microsoft.azure.sdk.iot.service.Message message)
     {
         // Codes_SRS_SERVICE_SDK_JAVA_AMQPSENDHANDLER_12_005: [The function shall create a new Message (Proton) object]
         org.apache.qpid.proton.message.Message protonMessage = Proton.message();
@@ -129,8 +118,7 @@ public class AmqpSendHandler extends AmqpConnectionHandler
         // Codes_SRS_SERVICE_SDK_JAVA_AMQPSENDHANDLER_12_009: [The function shall set the Message body to the created data section]
         protonMessage.setBody(section);
 
-        log.debug("Cloud to Device message with correlation id {} has been queued", protonMessage.getCorrelationId());
-        messageToBeSent = protonMessage;
+        return protonMessage;
     }
 
     /**
@@ -140,54 +128,81 @@ public class AmqpSendHandler extends AmqpConnectionHandler
     @Override
     public void onLinkFlow(Event event)
     {
-        if (messageToBeSent != null)
+        sendQueuedMessages();
+    }
+
+    @Override
+    public void onLinkRemoteOpen(Event event)
+    {
+        super.onLinkRemoteOpen(event);
+        event.getReactor().schedule(SEND_MESSAGES_PERIOD_MILLIS, this);
+    }
+
+    private void sendQueuedMessages()
+    {
+        synchronized (stateChangeLock)
         {
-            log.debug("Sending amqp message with correlation id {}", messageToBeSent.getCorrelationId());
-            // Codes_SRS_SERVICE_SDK_JAVA_AMQPSENDHANDLER_12_018: [The event handler shall get the Sender (Proton) object from the link]
-            Sender snd = (Sender) event.getLink();
-            // Codes_SRS_SERVICE_SDK_JAVA_AMQPSENDHANDLER_12_019: [The event handler shall encode the message and copy to the byte buffer]
-            if (snd.getCredit() > 0)
+            TransportMessage messageToSend = messageQueue.poll();
+            if (messageToSend != null)
             {
-                byte[] msgData = new byte[1024];
-                int length;
-                while (true)
-                {
-                    try
-                    {
-                        length = messageToBeSent.encode(msgData, 0, msgData.length);
-                        break;
-                    }
-                    catch (BufferOverflowException e)
-                    {
-                        msgData = new byte[msgData.length * 2];
-                    }
-                }
-                // Codes_SRS_SERVICE_SDK_JAVA_AMQPSENDHANDLER_12_020: [The event handler shall set the delivery tag on the Sender (Proton) object]
-                byte[] tag = String.valueOf(nextSendTag).getBytes();
-
-                //want to avoid negative delivery tags since -1 is the designated failure value
-                if (this.nextSendTag == Integer.MAX_VALUE || this.nextSendTag < 0)
-                {
-                    this.nextSendTag = 0;
-                }
-                else
-                {
-                    this.nextSendTag++;
-                }
-
-                Delivery dlv = snd.delivery(tag);
-                // Codes_SRS_SERVICE_SDK_JAVA_AMQPSENDHANDLER_12_021: [The event handler shall send the encoded bytes]
-                snd.send(msgData, 0, length);
-
-                snd.advance();
-
-                messageToBeSent = null;
-            }
-            else
-            {
-                log.warn("onLinkFlow called, but no link credit was available. No message was sent");
+                sendMessage(messageToSend, cloudToDeviceMessageSender);
             }
         }
+    }
+
+    private void sendMessage(TransportMessage transportMessage, Sender sender)
+    {
+        log.debug("Sending amqp message with correlation id {}", transportMessage.message.getCorrelationId());
+
+        Message message;
+        if (transportMessage.moduleId == null)
+        {
+            message =  convertToProtonMessage(String.format(DEVICE_PATH_FORMAT, transportMessage.deviceId), transportMessage.message);
+        }
+        else
+        {
+            message =  convertToProtonMessage(String.format(MODULE_PATH_FORMAT, transportMessage.deviceId, transportMessage.moduleId), transportMessage.message);
+        }
+
+        byte[] msgData = new byte[1024];
+        int length;
+        while (true)
+        {
+            try
+            {
+                length = message.encode(msgData, 0, msgData.length);
+                break;
+            }
+            catch (BufferOverflowException e)
+            {
+                msgData = new byte[msgData.length * 2];
+            }
+        }
+        byte[] tag = String.valueOf(nextSendTag).getBytes();
+
+        this.inProgressMessages.put(this.nextSendTag, transportMessage);
+
+        //want to avoid negative delivery tags since -1 is the designated failure value
+        if (this.nextSendTag == Integer.MAX_VALUE || this.nextSendTag < 0)
+        {
+            this.nextSendTag = 0;
+        }
+        else
+        {
+            this.nextSendTag++;
+        }
+
+        Delivery dlv = sender.delivery(tag);
+        sender.send(msgData, 0, length);
+        sender.advance();
+    }
+
+    @Override
+    public void onTimerTask(Event event)
+    {
+        sendQueuedMessages();
+
+        event.getReactor().schedule(SEND_MESSAGES_PERIOD_MILLIS, this);
     }
 
     @Override
@@ -198,21 +213,23 @@ public class AmqpSendHandler extends AmqpConnectionHandler
     }
 
     @Override
-    public void onMessageAcknowledged(DeliveryState deliveryState)
+    public void onMessageAcknowledged(MessageSentCallback.AcknowledgementState acknowledgementState, String statusCode, String statusDescription, int deliveryTag)
     {
-        deliveryAcknowledgement = new AmqpResponseVerification(deliveryState);
-        log.debug("Received acknowledgement for sent message with delivery state {}", deliveryState.getType());
-        if (deliveryAcknowledgement.getException() != null)
+        TransportMessage correspondingTransportMessage = this.inProgressMessages.remove(deliveryTag);
+
+        if (correspondingTransportMessage == null)
         {
-            log.warn("Sending the message threw an exception {}", deliveryAcknowledgement.getException());
+            log.warn("Received acknowledgement for a message that this sender did not send, or that it sent before closing. Ignoring it");
+            return;
         }
-        this.callback.onMessageSent(deliveryAcknowledgement);
+
+        correspondingTransportMessage.messageSentCallback.onMessageSent(acknowledgementState, statusCode, statusDescription, correspondingTransportMessage.context);
     }
 
     @Override
     public void openLinks(Session session, Map<Symbol, Object> properties)
     {
-        log.debug("Opening links for sending messages...");
+        log.debug("Opening links for sending messages");
         cloudToDeviceMessageSender = session.sender(tag);
         cloudToDeviceMessageSender.setProperties(properties);
         cloudToDeviceMessageSender.open();
@@ -241,5 +258,31 @@ public class AmqpSendHandler extends AmqpConnectionHandler
     public String getThreadNamePostfix()
     {
         return THREAD_POSTFIX_NAME;
+    }
+
+    @Override
+    public void close()
+    {
+        //super.close() also needs to grab this lock, but grabbing a lock within a synchronized block of the same lock is a no-op, so it is safe to grab here
+        synchronized (this.stateChangeLock)
+        {
+            super.close();
+
+            //After all links/sessions/connections are closed, all queued and in progress messages should callback with Released to signal they weren't processed
+            for (int deliveryTag : this.inProgressMessages.keySet())
+            {
+                TransportMessage abandonedMessage = this.inProgressMessages.get(deliveryTag);
+                abandonedMessage.messageSentCallback.onMessageSent(MessageSentCallback.AcknowledgementState.Released, "", "", null);
+            }
+
+            this.inProgressMessages.clear();
+
+            for (TransportMessage unsentMessage : this.messageQueue)
+            {
+                unsentMessage.messageSentCallback.onMessageSent(MessageSentCallback.AcknowledgementState.Released, "", "", null);
+            }
+
+            this.messageQueue.clear();
+        }
     }
 }

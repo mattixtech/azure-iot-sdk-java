@@ -5,6 +5,7 @@
 
 package com.microsoft.azure.sdk.iot.service.transport.amqps;
 
+import com.microsoft.azure.sdk.iot.service.MessageSentCallback;
 import com.microsoft.azure.sdk.iot.service.exceptions.*;
 import org.apache.qpid.proton.amqp.Symbol;
 import org.apache.qpid.proton.amqp.messaging.*;
@@ -60,6 +61,20 @@ public class AmqpResponseVerification implements AmqpError
         }
     }
 
+    public AmqpResponseVerification(MessageSentCallback.AcknowledgementState acknowledgementState, String errorCode, String errorDescription)
+    {
+        if (acknowledgementState == null)
+        {
+            //Codes_SRS_SERVICE_SDK_JAVA_AMQPRESPONSEVERIFICATION_25_008: [** The function shall save IotHubException if the amqp delivery state is null or undefined as per AMQP spec. **]**
+            this.exception = new IotHubException();
+        }
+
+        if (acknowledgementState == MessageSentCallback.AcknowledgementState.Rejected)
+        {
+            this.amqpResponseVerifier(errorCode, errorDescription);
+        }
+    }
+
     private void amqpResponseVerifier()
     {
         if (errorCondition == null)
@@ -89,6 +104,34 @@ public class AmqpResponseVerification implements AmqpError
         else if (this.errorCondition.equals(RESOURCE_LIMIT_EXCEEDED))
         {
             //Codes_SRS_SERVICE_SDK_JAVA_AMQPRESPONSEVERIFICATION_25_005: [** The function shall save IotHubDeviceMaximumQueueDepthExceededException if the amqp delivery state is rejected and error condition is amqp error code amqp:resource-limit-exceeded **]**
+            this.exception = new IotHubDeviceMaximumQueueDepthExceededException(errorDescription);
+        }
+    }
+
+    private void amqpResponseVerifier(String errorCode, String errorDescription)
+    {
+        if (errorCode == null)
+        {
+            this.exception = new IotHubException();
+        }
+        else if (errorCode.equals(NOT_FOUND.toString()))
+        {
+            this.exception = new IotHubNotFoundException(errorDescription);
+        }
+        else if (errorCode.equals(NOT_IMPLEMENTED.toString()))
+        {
+            this.exception =  new IotHubNotSupportedException(errorDescription);
+        }
+        else if (errorCode.equals(NOT_ALLOWED.toString()))
+        {
+            this.exception =  new IotHubInvalidOperationException(errorDescription);
+        }
+        else if (errorCode.equals(UNAUTHORIZED_ACCESS.toString()))
+        {
+            this.exception = new IotHubUnathorizedException(errorDescription);
+        }
+        else if (errorCode.equals(RESOURCE_LIMIT_EXCEEDED.toString()))
+        {
             this.exception = new IotHubDeviceMaximumQueueDepthExceededException(errorDescription);
         }
     }

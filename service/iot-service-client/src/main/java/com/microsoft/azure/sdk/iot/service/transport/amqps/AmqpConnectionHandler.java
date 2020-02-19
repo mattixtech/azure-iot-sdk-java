@@ -10,14 +10,15 @@ import com.microsoft.azure.sdk.iot.deps.transport.amqp.ErrorLoggingBaseHandler;
 import com.microsoft.azure.sdk.iot.deps.ws.impl.WebSocketImpl;
 import com.microsoft.azure.sdk.iot.service.DeliveryOutcome;
 import com.microsoft.azure.sdk.iot.service.IotHubServiceClientProtocol;
+import com.microsoft.azure.sdk.iot.service.MessageSentCallback;
 import com.microsoft.azure.sdk.iot.service.Tools;
-import com.microsoft.azure.sdk.iot.service.exceptions.IotHubException;
 import com.microsoft.azure.sdk.iot.service.transport.TransportUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.qpid.proton.Proton;
 import org.apache.qpid.proton.amqp.Symbol;
 import org.apache.qpid.proton.amqp.messaging.*;
 import org.apache.qpid.proton.amqp.transport.DeliveryState;
+import org.apache.qpid.proton.amqp.transport.ErrorCondition;
 import org.apache.qpid.proton.engine.*;
 import org.apache.qpid.proton.engine.impl.TransportInternal;
 import org.apache.qpid.proton.message.Message;
@@ -76,9 +77,8 @@ public abstract class AmqpConnectionHandler extends ErrorLoggingBaseHandler
 
     /**
      * Callback that is executed when a message that was sent to the service has been acknowledged
-     * @param deliveryState the type of acknowledgement the service gave for the message
      */
-    public abstract void onMessageAcknowledged(DeliveryState deliveryState);
+    public abstract void onMessageAcknowledged(MessageSentCallback.AcknowledgementState acknowledgementState, String statusCode, String statusDescription, int deliveryTag);
 
     /**
      * Open all links
@@ -291,8 +291,45 @@ public abstract class AmqpConnectionHandler extends ErrorLoggingBaseHandler
             Delivery d = event.getDelivery();
 
             DeliveryState remoteState = d.getRemoteState();
+            int deliveryTag = Integer.valueOf(new String(d.getTag()));
 
-            onMessageAcknowledged(remoteState);
+            String errorCode = "";
+            String errorDescription = "";
+            MessageSentCallback.AcknowledgementState acknowledgementState = null;
+            if (remoteState instanceof Rejected)
+            {
+                ErrorCondition errorCondition = ((Rejected) remoteState).getError();
+                if (errorCondition != null && errorCondition.getCondition() != null)
+                {
+                    // Codes_SRS_AMQPSIOTHUBCONNECTION_28_001: [If the acknowledgement sent from the service is "Rejected", this function shall map the error condition if it exists to amqp exceptions.]
+                    errorCode = errorCondition.getCondition().toString();
+                    errorDescription = "";
+                    if (errorCondition.getDescription() != null)
+                    {
+                        errorDescription = errorCondition.getDescription();
+                    }
+                }
+
+                acknowledgementState = MessageSentCallback.AcknowledgementState.Rejected;
+            }
+            else if (remoteState instanceof Released)
+            {
+                acknowledgementState = MessageSentCallback.AcknowledgementState.Released;
+            }
+            else if (remoteState instanceof Modified)
+            {
+                acknowledgementState = MessageSentCallback.AcknowledgementState.Modified;
+            }
+            else if (remoteState instanceof Accepted)
+            {
+                acknowledgementState = MessageSentCallback.AcknowledgementState.Accepted;
+            }
+            else if (remoteState instanceof Received)
+            {
+                acknowledgementState = MessageSentCallback.AcknowledgementState.Received;
+            }
+
+            onMessageAcknowledged(acknowledgementState, errorCode, errorDescription, deliveryTag);
 
             d.settle();
         }
@@ -430,25 +467,6 @@ public abstract class AmqpConnectionHandler extends ErrorLoggingBaseHandler
         super.onTransportError(event);
         event.getTransport().close_tail();
         releaseOpenLatch();
-    }
-
-    /**
-     * If an exception was encountered while opening the AMQP connection, this function shall throw that saved exception
-     * @throws IOException if an exception was encountered while opening the AMQP connection. The encountered
-     * exception will be the inner exception
-     * @throws IotHubException if an Iot Hub level exception occurs during transport
-     */
-    protected void validateConnectionWasSuccessful() throws IOException, IotHubException
-    {
-        if (this.savedException != null)
-        {
-            throw new IOException("Connection failed to be established", this.savedException);
-        }
-
-        if (this.protonJExceptionParser != null && this.protonJExceptionParser.getError() != null)
-        {
-            throw new IOException("Encountered exception during amqp connection: " + protonJExceptionParser.getError() + " with description " + protonJExceptionParser.getErrorDescription());
-        }
     }
 
     /**

@@ -5,10 +5,7 @@
 
 package com.microsoft.azure.sdk.iot.service.transport.amqps;
 
-import com.microsoft.azure.sdk.iot.service.IotHubConnectionString;
-import com.microsoft.azure.sdk.iot.service.IotHubServiceClientProtocol;
-import com.microsoft.azure.sdk.iot.service.Message;
-import com.microsoft.azure.sdk.iot.service.Tools;
+import com.microsoft.azure.sdk.iot.service.*;
 import com.microsoft.azure.sdk.iot.service.auth.IotHubServiceSasToken;
 import com.microsoft.azure.sdk.iot.service.exceptions.IotHubException;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  * and automatically closes the connection after sending it
  */
 @Slf4j
-public class AmqpSend implements AmqpSendHandlerMessageSentCallback
+public class AmqpSend implements MessageSentCallback
 {
     protected final String hostName;
     protected final String userName;
@@ -31,8 +28,9 @@ public class AmqpSend implements AmqpSendHandlerMessageSentCallback
     private CountDownLatch sendLatch;
     private static final int SEND_MESSAGE_TIMEOUT_SECONDS = 60;
     private long sasTokenExpiryTime;
-    private String correlationId;
     private static long DEFAULT_SAS_TOKEN_EXPIRY_TIME = 365*24*60*60;
+    private AmqpResponseVerification deliveryAcknowledgement;
+    private String correlationId;
 
     /**
      * Constructor to set up connection parameters
@@ -114,27 +112,27 @@ public class AmqpSend implements AmqpSendHandlerMessageSentCallback
      */
     public void send(String deviceId, String moduleId, Message message) throws IOException, IotHubException
     {
-        AmqpSendHandler amqpSendHandler = new AmqpSendHandler(this.hostName, this.userName, this.iotHubServiceClientProtocol, this);
+        AmqpSendHandler amqpSendHandler = new AmqpSendHandler(this.hostName, this.userName, this.iotHubServiceClientProtocol);
+
+        this.correlationId = message.correlationId;
 
         if (moduleId == null)
         {
             // Codes_SRS_SERVICE_SDK_JAVA_AMQPSEND_28_006: [The function shall create a binary message with the given content with deviceId only if moduleId is null]
-            amqpSendHandler.createProtonMessage(deviceId, message);
+            amqpSendHandler.queueMessage(message, deviceId, this, null);
         }
         else
         {
             // Codes_SRS_SERVICE_SDK_JAVA_AMQPSEND_28_001: [The function shall create a binary message with the given content with moduleId]
-            amqpSendHandler.createProtonMessage(deviceId, moduleId, message);
+            amqpSendHandler.queueMessage(message, deviceId, moduleId, this, null);
         }
-
-        this.correlationId = message.correlationId;
 
         sendLatch = new CountDownLatch(1);
 
         try
         {
             amqpSendHandler.open(new IotHubServiceSasToken(iotHubConnectionString, sasTokenExpiryTime).toString());
-            log.info("Amqp connection for sending message with correlation id {} was opened", this.correlationId);
+            log.info("Amqp connection for sending message with correlation id {} was opened", message.correlationId);
         }
         catch (InterruptedException e)
         {
@@ -157,12 +155,18 @@ public class AmqpSend implements AmqpSendHandlerMessageSentCallback
 
         // Old API usage dictates a single AMQP connection per-send, so we have to close the connection here
         amqpSendHandler.close();
-        log.info("Amqp connection for sending message with correlation id {} was closed", this.correlationId);
+        log.info("Amqp connection for sending message with correlation id {} was closed", message.correlationId);
+
+        if (deliveryAcknowledgement.getException() != null)
+        {
+            throw deliveryAcknowledgement.getException();
+        }
     }
 
     @Override
-    public void onMessageSent(AmqpResponseVerification deliveryAcknowledgement)
+    public void onMessageSent(AcknowledgementState acknowledgementState, String errorCode, String errorDescription, Object context)
     {
+        deliveryAcknowledgement = new AmqpResponseVerification(acknowledgementState, errorCode, errorDescription);
         sendLatch.countDown();
         log.info("Message with correlation id {} was sent successfully", this.correlationId);
     }
