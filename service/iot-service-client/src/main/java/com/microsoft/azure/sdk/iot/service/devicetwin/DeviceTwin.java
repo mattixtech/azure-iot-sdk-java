@@ -124,15 +124,7 @@ public class DeviceTwin
         device.setConnectionState(twinState.getConnectionState());
     }
 
-    /**
-     * This method updates device twin for the specified device.
-     *
-     * @param device The device with a valid id for which device twin is to be updated.
-     * @throws IOException This exception is thrown if the IO operation failed
-     * @throws IotHubException This exception is thrown if the response verification failed
-     */
-    public synchronized void updateTwin(DeviceTwinDevice device) throws IotHubException, IOException
-    {
+    public synchronized void twinRequest(DeviceTwinDevice device, HttpMethod httpMethod) throws IotHubException, IOException {
         if (device == null || device.getDeviceId() == null || device.getDeviceId().length() == 0)
         {
             /*
@@ -148,6 +140,10 @@ public class DeviceTwin
             **Codes_SRS_DEVICETWIN_25_045: [** The function shall throw IllegalArgumentException if the both desired and tags maps are either empty or null **]**
              */
             throw new IllegalArgumentException("Set either desired properties or tags for the device to be updated with");
+        }
+
+        if (httpMethod == null) {
+            throw new IllegalArgumentException("The HTTP method cannot be null");
         }
 
         URL url;
@@ -190,7 +186,31 @@ public class DeviceTwin
 
         **Codes_SRS_DEVICETWIN_25_020: [** The function shall verify the response status and throw proper Exception **]**
          */
-        HttpResponse response = DeviceOperations.request(this.iotHubConnectionString, url, HttpMethod.PATCH, twinJson.getBytes(StandardCharsets.UTF_8), String.valueOf(requestId++),0);
+        HttpResponse response = DeviceOperations.request(this.iotHubConnectionString, url, httpMethod, twinJson.getBytes(StandardCharsets.UTF_8), String.valueOf(requestId++),0);
+    }
+    
+    /**
+     * This method updates device twin for the specified device.
+     *
+     * @param device The device with a valid id for which device twin is to be updated.
+     * @throws IOException This exception is thrown if the IO operation failed
+     * @throws IotHubException This exception is thrown if the response verification failed
+     */
+    public synchronized void updateTwin(DeviceTwinDevice device) throws IotHubException, IOException
+    {
+        twinRequest(device, HttpMethod.PATCH);
+    }
+
+    /**
+     * This method replaces device twin for the specified device.
+     *
+     * @param device The device with a valid id for which device twin is to be replaced.
+     * @throws IOException This exception is thrown if the IO operation failed
+     * @throws IotHubException This exception is thrown if the response verification failed
+     */
+    public synchronized void replaceTwin(DeviceTwinDevice device) throws IotHubException, IOException
+    {
+        twinRequest(device, HttpMethod.PUT);
     }
 
     /**
